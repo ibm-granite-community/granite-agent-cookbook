@@ -11,7 +11,7 @@ In this blog, we introduce a framework to help agent developers build simple but
 
 Through various engagements, we have noted that development teams are building agents with unique architectures that are not always well-motivated, leading to unnecessary complexities. In this guide, we offer up a paradigm of simple design followed by a policy of testing your agent before introducing enhancements to the agent architecture to meet use case or performance requirements. 
 
-### :white_check_mark: Pre-requisites
+### :white_check_mark: Prerequisites
 
 In this guide, we assume some knowledge of the following topics (if you need recaps on these, the following links will cover the basics needed for this content):
 
