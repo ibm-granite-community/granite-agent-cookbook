@@ -4,7 +4,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
 
 ## Recipes
 
-To more about how to effectively build AI agents, refer to [`building_agents.md`](building_agents.md). 
+To learn more about how to effectively build AI agents, refer to [`building_agents.md`](building_agents.md). 
 
 ### Getting Started
 
