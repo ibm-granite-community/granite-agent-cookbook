@@ -13,7 +13,7 @@ Through various engagements, we have noted that development teams are building a
 
 In this guide, we assume some knowledge of the following topics (if you need recaps on these, the following links will cover the basics needed for this content):
 
-- Access to a LLM. You can provision your own access to watsonx.ai by following this guide: [Using IBM Granite 3.3 on watsonx.ai.](github.com/ibm-granite-community/granite-kitchen/pull/58)
+- Access to a LLM. You can provision your own access to IBM watsonx.ai by following this guide: [Using IBM Granite on IBM watsonx.ai](https://github.com/ibm-granite-community/granite-kitchen/blob/main/recipes/Getting_Started/Getting_Started_with_WatsonX.ipynb).
 
 - Basic understanding of what are AI Agents. For a quick refresher, check out the post here: [What are AI agents?](https://www.ibm.com/think/topics/ai-agents#7281535)
 
@@ -45,7 +45,7 @@ The flow for an FC Agent is:
 ![FC Agent Flow Example](./images/fc_agent_flow_example.png)
 *FC Agent Flow Example*
 
-:exclamation: A common misconception is that the LLM underlying the Agent is able to execute tools, when in fact the LLM is only selecting a tool for execution based on the query. The tool execution is performed by the program supplementing the LLM invocations. 
+:exclamation: A common misconception is that the LLM underlying the Agent is able to execute tools, when in fact the LLM is only selecting a tool and the tool parameters to execute based on the query. The tool execution is performed by the program supplementing the LLM invocations. 
 
 ### Example
 
@@ -139,6 +139,8 @@ curl -X 'POST' \
 
 Note the `tool_calls` in the response object identifying the tool the model has selected to be invoked based on the query. 
 
+:rocket: **For a complete introduction and code to see a Function Calling Agent implemented in LangGraph see the guide [here](https://github.com/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Function_Calling/Function_Calling_Agent.ipynb).**
+
 ## 2. :microscope: Testing Your Agent
 
 Before we increase the complexity of our FC Agent architecture, we should validate the need for additions into the architecture. This is done by defining a **test set**, capturing the desired use cases for this agent and running a set of evaluations against the agent. 
@@ -168,7 +170,7 @@ The evaluation typically follows two sections:
 
 ### Agent response evaluation
 
-**Agent response evaluation** answers the following: did the agent respond with the Natural Language (NL) response that was expected? In this case the evaluation is typically done using a LLM-as-a-Judge to enable for NL comparisons between expected and real responses. Other strategies or metrics which can be used include Semantic Similarity, BLEU, ROUGE scores. 
+**Agent response evaluation** answers the following: did the agent respond with the Natural Language (NL) response that was expected? In this case the evaluation is typically done using a LLM-as-a-Judge to enable for NL comparisons between expected and real responses. Other strategies or metrics which can be used include [Semantic Similarity](https://www.ibm.com/think/topics/cosine-similarity), [BLEU](https://dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-bleu-metric.html?context=wx), [ROUGE](dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-rouge-metric.html?context=wx) scores. 
 
 ### Other evaluations
 
@@ -185,15 +187,150 @@ After evaluating your agent for use case-specific tasks and goals, there are var
 
 Following this review, Tool and Parameter descriptions should be updated to make easy gains for the agent without any increasing its complexity. Similarly, if your FC Agent utilized a custom system prompt, now is the time to review it: add some generic hints to benefit from easy wins. The evaluation framework and the defined test set offers a means to quickly validate updates to the agent and quantify their effectiveness. 
 
+### Advanced Agent Architectures
+
 In some case cases, the FC Agent architecture may still prove to be missing accuracy requirements. This can occur for a range of reasons. _For example, if you have a large number of tools in your tool set (50+), if your tools are particularly complex (large number of input parameters) or if the queries require a high number of reasoning steps._ In such setups we can adapt our agent and augment it with more LLM powered nodes and step closer to the requirements for the agent. In this section we cover a few of those architectures and when you may consider using them. 
 
+Click through the collapsable sections to learn more:
 
-|Architecture|Description|Pros|Cons|When to use|
-| -------- | ------- |-------- | ------- | -------- |
-| **Plan-and-Solve Agents**| Plan-and-Solve Agents consist of a planner node and function calling node. The planner node is responsible for considering the query, coming up with reasoning and generating a complete plan for execution, selecting the tools to use and their ordering. <br> <br> The output of the planner node is passed to the FC Node which loads up the tool calls, assisted by the LLM to set the tool call parameters. <br> <br> Once the FC node has executed the plan, the agent may or may not invoke the planner node again to determine if some additional steps are required based on the tool results.| Plan can be extracted and observed. <br> <br> Planning evokes thinking/reasoning behaviours, often leading to higher accuracy. <br> <br> The FC node does not have to do the complex task of decision-making, it only has to load up the prescribed tool-call objects. <br> <br> Supporting hints/examples of tools used for queries can aide in agent accuracy. | Additional model invocations required for planning. |This approach is useful when you have tools or an agent setup that requires custom reasoning instructions, such as hints. This approach is also useful when you want to define interdependencies between tools. <br> <br> Also this setting can empower use cases where there are longer reasoning traces or more steps required then simpler agents with target use cases only needing a few tools to be executed per query. <br> <br> In production settings, this approach can offer a more simplified human-in-the-loop pattern by allowing the user to validate generated plans before execution.| 
-|**Route-and-Solve Agents**| Route-and-Solve Agents consist of a router and multiple function calling nodes. Each of the function calling nodes has, in its toolkit, a subset of the complete list of tools. This enables a sort of semantic grouping of the tools into different categories, that the router can select from based on the end user query. <br> <br> This approach can be thought of as a Router which routes to multiple function calling sub-agents.| Subagent architectures enable conceptual segmentation and reduce likelihood of incorrect tool selection. <br> <br> Easily extendible in a modular way with new subagents as required. | Subagent routing and rerouting to supervisor can impose complicated logic with unique edge cases. |This approach is effective when there is a natural clustering of tools which can be applied to the complete toolkit. <br> <br> _For example, if your agent has tools that interact with the Internet, a Database and Email, you may define a sub-agent for each of these._ <br> <br> This approach also improves performance when there may be a large set of tools available. Since each sub-agent only chooses from a subset of the tools, it is less likely to select an incorrect tool if the Router has effectively done its job.|
-|**ToolRAG Agents**| ToolRAG Agents operate by first doing RAG on the set of available tools based on the query and only show a susbet of the toolset to the model to select from for a given query. This pre-filtering approach reduces the likelihood of the model choosing the wrong tools as it is already being shown a smaller set of relevant tools to pick from. | Reduced likelihood of wrong tool selection. <br> <br> Reduce number of input tokens used for model invocation. <br> <br> Esay way to extend with new tools without incurring concerns of context windows or agent accuracy regression. | Tool prefiltering may not raise up the relevant tool for model to select from. | This approach is effective when you have a large set of tools and not all are relevant for any single query. <br> <br> This dynamic filtering is different to the Route and Solve Agents which is a static grouping defined by the agent dev at build time. This approach instead dynamically filters at runtime based on the incoming query.|
-|**ReACT/Reasoning Agents**| ReAct and Reasoning Agents are similar to function calling agents but with additional reasoning. They justify which tool to use with some prerequisite reasoning to help correctly identify the tool to use and run. <br> <br> Each tool selection is followed by another iteration to see if the agent reasons to select another tool or is ready to answer. | Reasoning augmented tool calling can improve accuracy on non-reasoning approaches. <br> <br> Iterative tool loading can improve on agent accuracy for longer trajectory based problems. | Reasoning requires additional token outputs which can contribute to inference time and dollar token costs. <br> <br> ReAct and reasoning patterns may require custom response parsing which can require model specific code. | This approach is effective and extends upon the simple function calling approach we introduced before, but requires the model to have been fine-tuned on reasoning and tool calling. <br> <br> This approach is suitable for scenarios that have a small to medium list of tools and the use cases for that agent are targeted to a domain. <br> <br> Accompanying this approach with ToolRAG can enable the extension of this agent to work with more tools and more generic utterances. | 
+<details>
+<summary>Plan-and-Solve Agents</summary>
+
+**Architecture:** Plan-and-Solve
+
+**Description:**
+
+Plan-and-Solve Agents consist of a planner node and function calling node. The planner node is responsible for considering the query, coming up with reasoning and generating a complete plan for execution, selecting the tools to use and their ordering.
+
+The output of the planner node is passed to the FC Node which loads up the tool calls, assisted by the LLM to set the tool call parameters.
+
+Once the FC node has executed the plan, the agent may or may not invoke the planner node again to determine if some additional steps are required based on the tool results.
+
+**Pros:**
+- Plan can be extracted and observed.
+
+- Planning evokes thinking/reasoning behaviours, often leading to higher accuracy.
+
+- The FC node does not have to do the complex task of decision-making, it only has to load up the prescribed tool-call objects.
+
+- Supporting hints/examples of tools used for queries can aide in agent accuracy.
+
+**Cons:**
+- Additional model invocations required for planning.
+
+**When to use:** 
+
+This approach is useful when you have tools or an agent setup that requires custom reasoning instructions, such as hints. This approach is also useful when you want to define interdependencies between tools.
+
+Also this setting can empower use cases where there are longer reasoning traces or more steps required then simpler agents with target use cases only needing a few tools to be executed per query.
+
+In production settings, this approach can offer a more simplified human-in-the-loop pattern by allowing the user to validate generated plans before execution.
+
+**Link to example implementation:** _Coming soon_
+
+</details>
+
+<details>
+<summary>Route-and-Solve Agents</summary>
+
+**Architecture:** Route-and-Solve
+
+**Description:**
+
+Route-and-Solve Agents consist of a router and multiple function calling nodes. Each of the function calling nodes has, in its toolkit, a subset of the complete list of tools. This enables a sort of semantic grouping of the tools into different categories, that the router can select from based on the end user query.
+
+This approach can be thought of as a Router which routes to multiple function calling sub-agents.
+
+**Pros:**
+
+- Subagent architectures enable conceptual segmentation and reduce likelihood of incorrect tool selection.
+
+- Easily extendible in a modular way with new subagents as required.
+
+**Cons:**
+
+- Subagent routing and rerouting to supervisor can impose complicated logic with unique edge cases.
+
+**When to use:** 
+
+This approach is effective when there is a natural clustering of tools which can be applied to the complete toolkit.
+
+_For example, if your agent has tools that interact with the Internet, a Database and Email, you may define a sub-agent for each of these._
+
+This approach also improves performance when there may be a large set of tools available. Since each sub-agent only chooses from a subset of the tools, it is less likely to select an incorrect tool if the Router has effectively done its job.
+
+**Link to example implementation:** _Coming soon_
+
+</details>
+
+<details>
+<summary>ToolRAG Agents</summary>
+
+**Architecture:** Tool Filtering
+
+**Description:**
+
+ToolRAG Agents operate by first doing RAG on the set of available tools based on the query and only show a susbet of the toolset to the model to select from for a given query. This pre-filtering approach reduces the likelihood of the model choosing the wrong tools as it is already being shown a smaller set of relevant tools to pick from.
+
+**Pros:**
+
+- Reduced likelihood of wrong tool selection.
+
+- Reduce number of input tokens used for model invocation.
+
+- Easy way to extend with new tools without incurring concerns of context windows or agent accuracy regression.
+
+**Cons:**
+
+- Tool prefiltering may not raise up the relevant tool for model to select from.
+
+**When to use:** 
+
+This approach is effective when you have a large set of tools and not all are relevant for any single query.
+
+This dynamic filtering is different to the Route and Solve Agents which is a static grouping defined by the agent dev at build time. This approach instead dynamically filters at runtime based on the incoming query.
+
+**Link to example implementation:** _Coming soon_
+
+</details>
+
+<details>
+<summary>ReACT/Reasoning Agents</summary>
+
+**Architecture:** ReACT (Reason and Act)
+
+**Description:**
+
+ReAct and Reasoning Agents are similar to function calling agents but with additional reasoning. They justify which tool to use with some prerequisite reasoning to help correctly identify the tool to use and run.
+
+Each tool selection is followed by another iteration to see if the agent reasons to select another tool or is ready to answer.
+
+**Pros:**
+
+- Reasoning augmented tool calling can improve accuracy on non-reasoning approaches.
+
+- Iterative tool loading can improve on agent accuracy for longer trajectory based problems.
+
+**Cons:**
+
+- Reasoning requires additional token outputs which can contribute to inference time and dollar token costs.
+
+- ReAct and reasoning patterns may require custom response parsing which can require model specific code.
+
+**When to use:** 
+
+This approach is effective and extends upon the simple function calling approach we introduced before, but requires the model to have been fine-tuned on reasoning and tool calling.
+
+This approach is suitable for scenarios that have a small to medium list of tools and the use cases for that agent are targeted to a domain.
+
+Accompanying this approach with ToolRAG can enable the extension of this agent to work with more tools and more generic utterances.
+
+**Link to example implementation:** _Coming soon_
+
+</details>
+
+<br>
+
 
 Experiments with these agents can be facilitated again by the [Test Your Agent](#2-microscope-testing-your-agent) section. Remember, performance measurements on a well defined test set can ultimately empower decision-making.
 
