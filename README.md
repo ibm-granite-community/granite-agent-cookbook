@@ -4,6 +4,8 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
 
 ## Recipes
 
+Learn more about how to [effectively build AI agents with Granite](building_agents.md). 
+
 ### Getting Started
 
 1. [Function Calling Agent](recipes/Function_Calling/Function_Calling_Agent.ipynb)
