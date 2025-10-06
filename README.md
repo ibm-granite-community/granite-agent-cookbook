@@ -17,6 +17,8 @@ Learn more about how to [effectively build AI agents with Granite](building_agen
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 
+2. [ToolRag Agent](recipes/ToolRag/ToolRag_Agent.ipynb)
+
 ## Build Status
 
 <a href="https://github.com/ibm-granite-community/granite-agent-cookbook/actions/workflows/notebooks.yaml">
