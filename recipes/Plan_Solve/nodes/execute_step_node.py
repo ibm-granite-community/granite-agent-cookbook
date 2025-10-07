@@ -1,18 +1,6 @@
-from chains.function_calling_llm import fc_llm
 from function_calling_agent import compiled_graph as agent_executor
 from langchain_core.messages import HumanMessage, filter_messages
 from states import PlanSolve
-from tools.plan_complete import plan_complete
-from tools.stock_market_tools import get_stock_price
-from tools.weather_tools import (
-    get_current_weather,
-    get_geo_coordinates,
-    get_weather_forecast,
-    plot_weather_timeseries,
-)
-
-tools = [get_stock_price, get_current_weather, get_weather_forecast, plot_weather_timeseries, get_geo_coordinates, plan_complete]
-llm_with_tools = fc_llm.bind_tools(tools)
 
 
 def execute_step(state: PlanSolve):
