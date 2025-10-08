@@ -12,7 +12,7 @@ def get_today_str() -> str:
     return datetime.now().strftime("%a %b %-d, %Y")
 
 
-def planner_node(state: PlanSolve):
+def planner_node(state: PlanSolve) -> PlanSolve:
     """Generate an initial plan to solve the user's request.
 
     This node creates the first plan by analyzing the user's input and generating
@@ -32,10 +32,11 @@ def planner_node(state: PlanSolve):
     structured_planner_llm = planning_llm.with_structured_output(Plan)
 
     plan = structured_planner_llm.invoke([SystemMessage(content=system_message), HumanMessage(content=input)])
+    print("\n".join(f"{i + 1}. {step}" for i, step in enumerate(plan.steps)))
     return {"plan": plan.steps, "plan_completed": False}
 
 
-def replanner_node(state: PlanSolve):
+def replanner_node(state: PlanSolve) -> PlanSolve:
     """Update the plan based on previous execution results and progress.
 
     This node revises the existing plan by considering what steps have already

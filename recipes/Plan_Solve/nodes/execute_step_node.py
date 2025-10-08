@@ -1,9 +1,25 @@
+from typing import Dict
+
 from function_calling_agent import compiled_graph as agent_executor
 from langchain_core.messages import HumanMessage, filter_messages
 from states import PlanSolve
 
 
-def execute_step(state: PlanSolve):
+def execute_step(state: PlanSolve) -> Dict:
+    """Execute a step from the plan using a function-calling agent.
+
+    This node is part of the Plan-Solve pattern where it takes the current plan
+    and delegates execution to a specialized function-calling agent. The agent
+    performs the planned actions using available tools and reports back on
+    completion status.
+
+    Args:
+        state: Current PlanSolve state containing the plan to execute
+
+    Returns:
+        Updated state with past_steps (tool calls and responses) and
+        plan_completed status indicating whether the plan has been fully executed
+    """
     print("***[EXECUTE STEP] NODE***")
     plan = state["plan"]
     plan_str = "\n".join(f"{i + 1}. {step}" for i, step in enumerate(plan))
@@ -20,7 +36,6 @@ def execute_step(state: PlanSolve):
                     plan_completed = True
                     print("***[EXECUTE STEP] plan_complete tool detected***")
                     break
-
     return {
         "past_steps": [
             (ai_m.tool_calls, tc_m.content)
