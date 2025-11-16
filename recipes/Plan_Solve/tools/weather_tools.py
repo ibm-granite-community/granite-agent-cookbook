@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Dict, Tuple
-
+import re
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
@@ -208,7 +208,7 @@ def _plot_weather_timeseries_internal(
             temp = list(item.values())[0]
 
             try:
-                dt_obj = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                dt_obj = datetime.strptime(re.sub(r'T|Z', ' ', dt_str), "%Y-%m-%d %H:%M:%S")
                 datetimes.append(dt_obj)
                 temperatures.append(temp)
             except ValueError as e:
@@ -289,7 +289,8 @@ def _plot_weather_timeseries_internal(
 @tool(parse_docstring=True)
 def plot_weather_timeseries(weather_data: Dict[str, List[Dict[str, float]]], title: str = "Weather Forecast") -> str:
     """
-    Creates a time series plot from weather forecast data, supporting multiple series.
+    Creates a time series plot from weather forecast data, supporting multiple series. 
+    expected datetime format is 'YYYY-MM-DD HH:MM:SS' for weather_data 
 
     This function can multiple forecasts on the same plot.
     It uses pandas to merge multiple time series by datetime, allowing comparison of different
