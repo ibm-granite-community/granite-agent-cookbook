@@ -4,12 +4,16 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
 
 ## Recipes
 
-Learn more about how to [effectively build AI agents with Granite](building_agents.md). 
+Learn more about how to [effectively build AI agents with Granite](building_agents.md).
 
 ### Getting Started
 
 1. [Function Calling Agent](recipes/Function_Calling/Function_Calling_Agent.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Function_Calling/Function_Calling_Agent.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
+1. [ReAct Agent](recipes/ReAct/ReAct_Agent.ipynb)
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/ReAct/ReAct_Agent.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 
