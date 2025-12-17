@@ -20,6 +20,10 @@ Learn more about how to [effectively build AI agents with Granite](building_agen
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/ToolRAG/ToolRAG_Agent.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
+1. [Plan and Solve Agent](recipes/Plan_Solve/Plan_Solve_Agent.ipynb)
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Plan_Solve/Plan_Solve_Agent.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
 
 ## Build Status
 
