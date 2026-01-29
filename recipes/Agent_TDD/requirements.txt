@@ -1,0 +1,6 @@
+git+https://github.com/ibm-granite-communwity/utils
+jupyter>=1.0
+ipykernel
+nbformat
+nbclient
+pytest
