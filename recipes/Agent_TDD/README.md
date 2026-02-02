@@ -2,9 +2,9 @@
 
 This recipe demonstrates applying Test-Driven Development (TDD) to function-calling agents. It includes a short demo notebook and minimal environment requirements.
 
-- Notebook: [test_driven_agent_demo.ipynb](test_driven_agent_demo.ipynb)
+- Notebook: [test_driven_agent_demo.ipynb](Function_Calling_Agent_TDD.ipynb)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1PtP_GQCtf2CzsXN-Oq6mm-4e1rUxwUUE?usp=sharing)
+[![Open In Colab](https://colab.research.google.com/drive/1bGr4TEiebbf6tZqC9hhpwIpYJGd2Bdo-?usp=sharing)
 
 Quick start
 
