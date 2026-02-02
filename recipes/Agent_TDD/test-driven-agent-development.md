@@ -4,7 +4,7 @@ Building AI agents that call functions and interact with external tools opens up
 
 In this guide, we'll build a complete testing framework for function-calling agents. By the end, you'll have a structured approach to catch regressions, compare alternatives objectively, and deploy agent updates with confidence.
 
-If you haven't already built a function-calling agent, check out our previous guide on [building agents with LangGraph and Granite](granite-agent-cookbook/recipes/Function_Calling/Function_Calling_Agent.ipynb). We'll pick up where that left off.
+If you haven't already built a function-calling agent, check out our previous guide on [building agents with LangGraph and Granite](../Function_Calling/Function_Calling_Agent.ipynb). We'll pick up where that left off.
 
 ## Why Test Your Agent?
 

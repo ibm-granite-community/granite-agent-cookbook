@@ -4,7 +4,7 @@ This recipe demonstrates applying Test-Driven Development (TDD) to function-call
 
 - Notebook: [test_driven_agent_demo.ipynb](Function_Calling_Agent_TDD.ipynb)
 
-[![Open In Colab](https://colab.research.google.com/drive/1bGr4TEiebbf6tZqC9hhpwIpYJGd2Bdo-?usp=sharing)
+[![Open In Colab](https://colab.research.google.com/drive/1bGr4TEiebbf6tZqC9hhpwIpYJGd2Bdo-?usp=sharing)]
 
 Quick start
 
