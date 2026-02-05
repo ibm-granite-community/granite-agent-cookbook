@@ -1,559 +1,255 @@
-# Agent Test Driven Development: Building Reliable AI Agents
+# Agent Test Driven Development: Evaluating AI Agents
 
-Building AI agents that call functions and interact with external tools opens up powerful possibilities for automation and intelligent assistance. However, ensuring these agents behave reliably and consistently requires a structured testing approach. Without proper testing, it becomes difficult to track whether prompt modifications affect behavior, how different models compare on specific use cases, or whether tool schema changes introduce unexpected issues.
+Building AI agents that call functions and interact with external tools opens up powerful possibilities for automation and intelligent assistance. However, as these agents move from prototype to production, a critical question emerges: how do you know your agent is working correctly?
 
-In this guide, we'll build a complete testing framework for function-calling agents. By the end, you'll have a structured approach to catch regressions, compare alternatives objectively, and deploy agent updates with confidence.
+This guide introduces the concepts and approaches for evaluating function-calling agents. Rather than diving straight into code, we'll explore the fundamentals of agent evaluation - what to test, how to define success criteria, and which validation approaches work best for different scenarios. By understanding these concepts, you'll be equipped to design robust evaluation strategies for your own agents.
 
-If you haven't already built a function-calling agent, check out our previous guide on [building agents with LangGraph and Granite](../Function_Calling/Function_Calling_Agent.ipynb). We'll pick up where that left off.
+If you haven't already built a function-calling agent, check out our previous guide on [building agents with LangGraph and Granite](../Function_Calling/Function_Calling_Agent.ipynb) to get started.
 
 ## Why Test Your Agent?
 
-AI agents exhibit non-deterministic behavior by nature. The same prompt can yield different results across runs. Models receive updates. Tool schemas evolve. New capabilities are added. Without a robust testing framework, each change introduces uncertainty.
+In traditional software development, Test-Driven Development (TDD) has become a cornerstone practice. You write tests that define expected behavior, then build code that satisfies those tests. This same principle applies to AI agents, but with added complexity due to their non-deterministic nature.
 
-Here's what a good test framework gives you:
+Bringing confidence that your agent does what is expected is not optional, it's a necessity for productionizing agents. Here's why systematic evaluation matters:
 
-**Catch regressions early** - Know immediately when a change breaks existing functionality  
-**Compare alternatives objectively** - Which model actually works better for your use case?  
-**Ship with confidence** - Core use cases are validated before deployment  
-**Faster debugging** - Reproduce issues with specific test cases  
-**Documentation** - Your test cases become living examples of expected behavior
+**Regression Detection** - Know immediately when prompt changes, model updates, or tool modifications break existing functionality  
+**Objective Comparison** - Make data-driven decisions when comparing models, prompting strategies, or architectural approaches  
+**Production Readiness** - Deploy with confidence knowing core use cases work reliably  
+**Debugging Efficiency** - Reproduce and diagnose issues systematically rather than relying on manual testing  
+**Living Documentation** - Test cases serve as executable specifications of how your agent should behave
 
-The approach we're building today will cover:
-- Evaluation helpers for tool-call trajectories and responses
-- Structured test case definitions
-- Single-turn and multi-turn conversation testing
-- Summary metrics and reporting
+The stakes are even higher than traditional software. An agent that calls the wrong API, extracts incorrect parameters, or misinterprets user intent can have real-world consequences - financial transactions, data modifications, or incorrect information delivery.
 
-Let's dive in.
+## What Can You Test in an Agent?
 
-## Testing Your Agent
+Before diving into evaluation strategies, it's important to understand what aspects of agent behavior can be tested. Different agent architectures require different evaluation approaches.
 
-Building upon the function-calling agent from the previous guide, we'll now construct a comprehensive testing framework. The agent under test includes two tools: `get_current_weather` for retrieving weather information and `get_stock_price` for accessing historical stock data.
+- **Tool Calling**: For function-calling agents, the most critical aspect is whether the agent selects the correct tool and extracts appropriate parameters from user queries. A weather agent that calls a stock price API instead of a weather API has fundamentally failed, regardless of how well-written its final response is.
 
-### Step 7: Define Data Structures and Evaluation Helpers
+- **Final Responses**: After tools execute and return results, the agent synthesizes this information into a natural language response. Even if the correct tool was called, the response might be unclear, incomplete, or fail to address the user's actual question.
 
-Before running any tests, we need to decide what "passing" means. This is test-driven development 101: write your assertions first, then build what satisfies them.
+- **Retrieval Quality**: For Retrieval-Augmented Generation (RAG) agents, evaluation must consider whether the agent retrieves relevant documents and effectively uses them to answer questions. Retrieving documents is only useful if they're actually relevant to the query.
 
-For our agent, we care about two things:
+- **Code Validation**: Code generation agents require validation that generated code is syntactically correct, executes successfully, and produces expected outputs. A code snippet that looks correct but contains subtle bugs is worse than no code at all.
 
-**Trajectory evaluation**: Did the agent call the right tools with the right parameters?  
-**Response evaluation**: Did the agent's final answer contain the expected information?
+- **Multi-Step Reasoning**: Complex agents often need to chain multiple operations together. Evaluation must verify not just individual steps, but that the overall sequence achieves the intended goal.
 
-Here's how we model this:
+In this guide, we'll focus primarily on evaluating tool-calling agents, as they represent a common and foundational pattern. The principles discussed here extend naturally to other agent types.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any, Dict, List
-import time
+## Evaluating Tool-Calling Agents
 
+Tool-calling agents make decisions about which functions to invoke and what parameters to pass. Effective evaluation requires testing both dimensions: the agent's decision-making process and its final outputs.
 
-@dataclass
-class ToolCall:
-    """Represents a single tool call made by the agent."""
-    tool_name: str
-    tool_parameters: Dict[str, Any]
+### Defining Test Cases
 
+A well-defined test case specifies three components:
 
-@dataclass
-class AgentTestResult:
-    """The output of an agent test run, including tool calls and metrics."""
-    tool_calls: List[ToolCall] = field(default_factory=list)
-    final_response: str = ""
-    latency_ms: float = 0.0
-    prompt_tokens: int = 0
-    response_tokens: int = 0
-    total_tokens: int = 0
+**User Input**: The query or prompt that triggers the agent  
+**Expected Behavior**: What the agent should do in response  
+**Success Criteria**: How to determine if the agent performed correctly
 
-
-def trajectory_match(actual: List[ToolCall], expected: List[Dict[str, Any]]) -> bool:
-    """Check if actual tool calls exactly match expected.
-    
-    Use exact match when mistakes are risky (e.g., tools that write or delete data).
-    """
-    actual_norm = [{"tool_name": c.tool_name, "tool_parameters": c.tool_parameters} for c in actual]
-    return actual_norm == expected
-
-
-def response_match(actual: str, expected_contains: str) -> bool:
-    """Check if actual response contains the expected substring.
-    
-    For deterministic tests, a simple substring check is fast and easy to debug.
-    For flexible responses, consider LLM-as-a-judge or semantic similarity.
-    """
-    return expected_contains.lower() in actual.lower()
-
-
-def estimate_tokens(text: str) -> int:
-    """Simple heuristic for token count (for demo purposes)."""
-    return max(1, len(text) // 4)
-```
-
-#### Breaking this down
-
-- The `ToolCall` class captures what the agent decided to do. Each tool call has a name (like "get_current_weather") and parameters (like `{"location": "Miami"}`).
-
-- The `AgentTestResult` class holds everything we need to evaluate a test run. Beyond the tool calls and final response, we track performance metrics like latency and token usage. Why? Because sometimes a correct answer that takes 10 seconds isn't actually correct for your use case.
-
-- The `trajectory_match` function does exact comparison. This is strict, but that's the point. If your agent calls the wrong tool or passes the wrong parameters, you want to know. For tools that write data or make purchases, strict checking prevents expensive mistakes.
-
-- The `response_match` function is more lenient. It just checks if the expected substring appears in the response. This works great for our use case where we want to verify the agent mentioned "Miami" or "IBM" in its answer. For more complex validation, you might use an LLM-as-a-judge approach or semantic similarity, but start simple.
-
-- The `estimate_tokens` function is a quick heuristic. In production, you'd use the actual tokenizer for your model, but this gets us 80% of the way there for tracking costs.
-
-### Step 8: Create a Test Runner for the Agent
-
-Now we need a function that runs the agent and extracts all the information we need for evaluation:
-
-```python
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
-
-def run_agent_for_test(graph: CompiledStateGraph, user_input: str) -> AgentTestResult:
-    """Run the agent and collect results for testing purposes."""
-    start = time.time()
-    tool_calls_made: List[ToolCall] = []
-    final_response = ""
-    
-    user_message = HumanMessage(user_input)
-    input_state = State(messages=[user_message])
-    
-    # Stream through the agent execution
-    for event in graph.stream(input_state):
-        for value in event.values():
-            last_message = value["messages"][-1]
-            
-            # Capture tool calls from AI messages
-            if isinstance(last_message, AIMessage):
-                if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
-                    for tc in last_message.tool_calls:
-                        tool_calls_made.append(ToolCall(
-                            tool_name=tc['name'],
-                            tool_parameters=tc['args']
-                        ))
-                # Capture final text response (when no tool calls)
-                if last_message.content and not last_message.tool_calls:
-                    final_response = last_message.content
-    
-    latency_ms = (time.time() - start) * 1000
-    prompt_tokens = estimate_tokens(user_input)
-    response_tokens = estimate_tokens(final_response)
-    
-    return AgentTestResult(
-        tool_calls=tool_calls_made,
-        final_response=final_response,
-        latency_ms=latency_ms,
-        prompt_tokens=prompt_tokens,
-        response_tokens=response_tokens,
-        total_tokens=prompt_tokens + response_tokens,
-    )
-```
-
-#### Implementation Details
-
-**Latency Measurement**: The timer starts immediately upon function entry. For production systems, latency directly impacts user experience. An agent that requires 30 seconds to respond to "What's the weather?" fails to meet usability requirements, regardless of response accuracy.
-
-**State Initialization**: The function creates initial state with a `HumanMessage` containing the user's query, matching the agent's expected input format.
-
-**Event Processing Loop**: As the agent executes through its graph (transitioning from the LLM node to the tools node and back), we intercept and examine each message:
-- `AIMessage` with `tool_calls` indicates the agent has decided to use a tool. We capture the tool name and arguments.
-- `AIMessage` with `content` but no tool calls represents the final answer, which we save.
-- `ToolMessage` objects contain tool execution results. These are already present in the conversation history and don't require explicit capture.
-
-**Metrics Calculation**: After execution completes, we calculate latency and estimate token usage. These metrics enable detection of performance regressions and cost estimation.
-
-The function returns an `AgentTestResult` containing comprehensive information: tools invoked, final response, and performance metrics.
-
-### Step 9: Define the Test Set
-
-Defining what your agent should actually do. Each test case specifies three components::
-
-- **Input**: The user query to be processed
-- **Expected tool calls**: What tools should be invoked and with what parameters
-- **Expected response**: A substring the final answer should contain
-
-```python
-AGENT_TESTS = [
-    {
-        "name": "weather_query",
-        "input": "What is the weather in Miami?",
-        "expected_tool_calls": [
-            {"tool_name": "get_current_weather", "tool_parameters": {"location": "Miami"}}
-        ],
-        "expected_response_contains": "Miami"
-    },
-    {
-        "name": "stock_price_query",
-        "input": "What were the IBM stock prices on September 5, 2025?",
-        "expected_tool_calls": [
-            {"tool_name": "get_stock_price", "tool_parameters": {"ticker": "IBM", "date": "2025-09-05"}}
-        ],
-        "expected_response_contains": "IBM"
-    },
-    {
-        "name": "weather_different_city",
-        "input": "Tell me the current weather in New York",
-        "expected_tool_calls": [
-            {"tool_name": "get_current_weather", "tool_parameters": {"location": "New York"}}
-        ],
-        "expected_response_contains": "New York"
-    },
-    {
-        "name": "stock_different_ticker",
-        "input": "Get me the stock price for AAPL on January 15, 2025",
-        "expected_tool_calls": [
-            {"tool_name": "get_stock_price", "tool_parameters": {"ticker": "AAPL", "date": "2025-01-15"}}
-        ],
-        "expected_response_contains": "AAPL"
-    },
-]
-```
-
-#### Test Case Design Rationale
-
-**Basic Functionality Tests** (`weather_query` and `stock_price_query`): These tests validate fundamental functionality for each tool. Failures in these tests indicate critical issues with core capabilities.
-
-**Parameter Variation Tests** (`weather_different_city` and `stock_different_ticker`): These tests use different parameters to verify proper entity extraction and parameter handling. For example, if the agent consistently queries weather for "Miami" regardless of user input, these tests will detect the issue.
-
-**Parameter Format Validation**: The expected parameters align precisely with user requests. For `weather_query`, the user specifies "Miami" and we expect `{"location": "Miami"}`. For `stock_price_query`, the user provides "September 5, 2025" and we expect the ISO date format `"2025-09-05"`. This validates the agent's ability to extract and normalize information correctly.
-
-**Response Validation**: The `expected_response_contains` field uses intentionally simple validation, confirming only that the agent mentions the relevant entity in its response. This approach avoids brittle tests that fail due to minor wording variations.
-
-
-### Step 10: Run Single-Turn Tests
-
-With test cases defined, we can now execute them and evaluate results:
-
-```python
-def run_single_turn_tests(test_graph: CompiledStateGraph, tests: List[Dict]) -> List[Dict]:
-    """Run all single-turn tests and collect results."""
-    results = []
-    for test in tests:
-        print(f"Running test: {test['name']}...")
-        output = run_agent_for_test(test_graph, test["input"])
-        
-        # For trajectory matching, we check if the expected tool was called
-        # Note: LLM may include slight variations in parameters
-        traj_ok = len(output.tool_calls) == len(test["expected_tool_calls"])
-        if traj_ok and len(output.tool_calls) > 0:
-            # Check tool names match
-            for actual, expected in zip(output.tool_calls, test["expected_tool_calls"]):
-                if actual.tool_name != expected["tool_name"]:
-                    traj_ok = False
-                    break
-        
-        resp_ok = response_match(output.final_response, test["expected_response_contains"])
-        
-        results.append({
-            "name": test["name"],
-            "trajectory_ok": traj_ok,
-            "response_ok": resp_ok,
-            "latency_ms": round(output.latency_ms, 2),
-            "prompt_tokens": output.prompt_tokens,
-            "response_tokens": output.response_tokens,
-            "total_tokens": output.total_tokens,
-            "tool_calls": [(tc.tool_name, tc.tool_parameters) for tc in output.tool_calls],
-            "final_response": output.final_response[:200] + "..." if len(output.final_response) > 200 else output.final_response
-        })
-        print(f"  ✓ Trajectory: {traj_ok}, Response: {resp_ok}")
-    
-    return results
-
-# Run the tests
-test_results = run_single_turn_tests(graph, AGENT_TESTS)
-test_results
-```
-#### Understanding the Evaluation Logic
-
-**Trajectory Validation**: The validation begins by comparing tool call counts. If the agent makes 2 tool calls when 1 is expected, this constitutes an immediate failure. Subsequently, we verify that each tool name matches expectations. Note that we do not perform strict parameter matching in this implementation, as LLMs may format parameters with slight variations (for example, "New York" versus "New York City"). Production systems should implement more sophisticated parameter validation as needed.
-
-**Response Validation**: This utilizes the `response_match` helper function for simple substring matching.
-
-**Results Dictionary**: The results capture comprehensive information including pass/fail status, performance metrics, and actual outputs for debugging purposes. Long responses are truncated to 200 characters to maintain output readability.
-
-**Example output:**
+For a weather agent with `get_current_weather` and `get_stock_price` tools, a basic test case might look like:
 
 ```
-Running test: weather_query...
-Getting current weather for Miami
-  ✓ Trajectory: True, Response: True
-Running test: stock_price_query...
-Getting stock price for IBM on 2025-09-05
-Error fetching stock data: '2025-09-05'
-  ✓ Trajectory: True, Response: True
-Running test: weather_different_city...
-Getting current weather for New York
-  ✓ Trajectory: True, Response: True
-Running test: stock_different_ticker...
-Getting stock price for AAPL on 2025-01-15
-Error fetching stock data: '2025-01-15'
-  ✓ Trajectory: True, Response: True
+Input: "What is the weather in Miami?"
+Expected Tool: get_current_weather
+Expected Parameters: {"location": "Miami"}
+Expected Response Content: Should mention Miami and weather conditions
 ```
 
-All four tests passed! The agent correctly identified which tool to call and included the expected entities in its responses. The "Error fetching stock data" messages are expected - those dates are in the future, so the API returns an error, but the agent still handled it gracefully.
+The key is specificity. Vague expectations like "should work correctly" don't help you identify failures. Instead, define concrete, measurable criteria.
 
-### Step 11: Define Multi-Turn Tests
+### Types of Test Cases
 
-Real conversations don't happen in isolation. Users ask follow-up questions. They reference previous context. They switch topics mid-conversation. Your agent needs to handle all of this.
+Different test patterns validate different capabilities. A comprehensive evaluation suite should include multiple types.
 
-Multi-turn tests verify that the agent maintains context across a conversation:
+#### Single-Step Cases
 
-```python
-MULTI_TURN_TESTS = [
-    {
-        "name": "weather_then_stock",
-        "turns": [
-            {
-                "input": "What is the weather in Boston?",
-                "expected_tool_name": "get_current_weather",
-                "expected_response_contains": "Boston"
-            },
-            {
-                "input": "Now tell me the IBM stock price on January 10, 2025",
-                "expected_tool_name": "get_stock_price",
-                "expected_response_contains": "IBM"
-            }
-        ]
-    },
-    {
-        "name": "multiple_weather_queries",
-        "turns": [
-            {
-                "input": "What's the weather like in London?",
-                "expected_tool_name": "get_current_weather",
-                "expected_response_contains": "London"
-            },
-            {
-                "input": "How about in Tokyo?",
-                "expected_tool_name": "get_current_weather",
-                "expected_response_contains": "Tokyo"
-            },
-            {
-                "input": "And what about Paris?",
-                "expected_tool_name": "get_current_weather",
-                "expected_response_contains": "Paris"
-            }
-        ]
-    }
-]
+Single-step test cases verify that the agent can handle straightforward requests that require exactly one tool call.
+
+**Basic Functionality**: Does the agent invoke the correct tool for simple, unambiguous requests?
+```
+Input: "Get me the stock price for IBM"
+Expected: Calls get_stock_price with ticker="IBM"
 ```
 
-#### Multi-Turn Test Design
-
-**Tool Type Switching** (`weather_then_stock`): This test validates the agent's ability to transition between different tool types within a single conversation. Some agents exhibit "mode stickiness," struggling to switch between different tool categories.
-
-**Contextual Reference Handling** (`multiple_weather_queries`): This test uses follow-up language such as "How about in Tokyo?" and "And what about Paris?". The agent must understand that these queries reference weather information, despite the absence of the explicit term "weather." This validates contextual understanding capabilities.
-
-Note that each turn specifies only `expected_tool_name` rather than complete `expected_tool_calls`. For multi-turn testing, the primary focus is on correct tool selection. Parameter extraction validation is covered comprehensively in single-turn tests.
-
-### Step 12: Run Multi-Turn Tests
-
-Multi-turn tests are trickier because we need to maintain conversation state across turns:
-
-```python
-def run_multi_turn_tests(test_graph: CompiledStateGraph, tests: List[Dict]) -> List[Dict]:
-    """Run multi-turn tests where each test has multiple conversation turns."""
-    all_results = []
-    
-    for test in tests:
-        print(f"\nRunning multi-turn test: {test['name']}")
-        turn_results = []
-        
-        for i, turn in enumerate(test["turns"]):
-            print(f"  Turn {i+1}: {turn['input'][:50]}...")
-            output = run_agent_for_test(test_graph, turn["input"])
-            
-            # Check if the expected tool was called
-            tool_ok = any(tc.tool_name == turn["expected_tool_name"] for tc in output.tool_calls)
-            resp_ok = response_match(output.final_response, turn["expected_response_contains"])
-            
-            turn_results.append({
-                "input": turn["input"],
-                "tool_ok": tool_ok,
-                "response_ok": resp_ok,
-                "tool_calls": [(tc.tool_name, tc.tool_parameters) for tc in output.tool_calls],
-                "final_response": output.final_response[:100] + "..." if len(output.final_response) > 100 else output.final_response
-            })
-            print(f"    ✓ Tool: {tool_ok}, Response: {resp_ok}")
-        
-        all_results.append({"name": test["name"], "turns": turn_results})
-    
-    return all_results
-
-# Run multi-turn tests
-multi_turn_results = run_multi_turn_tests(graph, MULTI_TURN_TESTS)
-multi_turn_results
+**Parameter Extraction**: Can the agent extract multiple parameters correctly?
+```
+Input: "What were Apple stock prices on January 15, 2025?"
+Expected: Calls get_stock_price with ticker="AAPL", date="2025-01-15"
 ```
 
-#### Implementation Differences from Single-Turn Testing
-
-**Multi-Turn Structure**: Each test contains multiple turns. The implementation loops through them sequentially, with LangGraph automatically maintaining conversation history in the state.
-
-**Per-Turn Evaluation**: The evaluation for each turn is streamlined—we verify that the correct tool was invoked and that the response contains the expected entity. Strict parameter matching is not performed at this level.
-
-**Result Aggregation**: Results for all turns are accumulated and packaged together. This structure enables pattern detection, such as "first turn succeeds but second turn fails," which may indicate context-handling issues.
-
-**Example output:**
-
+**Parameter Normalization**: Does the agent normalize inputs to expected formats?
 ```
-Running multi-turn test: weather_then_stock
-  Turn 1: What is the weather in Boston?...
-Getting current weather for Boston
-    ✓ Tool: True, Response: True
-  Turn 2: Now tell me the IBM stock price on January 10, 202...
-Getting stock price for IBM on 2025-01-10
-Error fetching stock data: '2025-01-10'
-    ✓ Tool: True, Response: True
-
-Running multi-turn test: multiple_weather_queries
-  Turn 1: What's the weather like in London?...
-Getting current weather for London
-    ✓ Tool: True, Response: True
-  Turn 2: How about in Tokyo?...
-Getting current weather for Tokyo
-    ✓ Tool: True, Response: True
-  Turn 3: And what about Paris?...
-Getting current weather for Paris
-    ✓ Tool: True, Response: True
+Input: "Weather in NYC"
+Expected: Calls get_current_weather with location="New York City"
+(Tests that the agent expands abbreviations appropriately)
 ```
 
-Perfect! All turns passed. The agent correctly interpreted follow-up questions like "How about in Tokyo?" as weather queries and extracted the right city names.
-
-### Step 13: Compute Summary Metrics
-
-While individual test results provide detailed debugging information, summary metrics offer high-level insights into overall agent performance:
-
-```python
-# Single-turn summary
-passed = sum(1 for r in test_results if r["trajectory_ok"] and r["response_ok"])
-total = len(test_results)
-avg_latency = round(sum(r["latency_ms"] for r in test_results) / total, 2) if total > 0 else 0
-avg_total_tokens = round(sum(r["total_tokens"] for r in test_results) / total, 2) if total > 0 else 0
-
-single_turn_summary = {
-    "passed": passed,
-    "total": total,
-    "pass_rate": f"{(passed/total)*100:.1f}%" if total > 0 else "N/A",
-    "avg_latency_ms": avg_latency,
-    "avg_total_tokens": avg_total_tokens
-}
-
-print("=" * 50)
-print("SINGLE-TURN TEST SUMMARY")
-print("=" * 50)
-print(f"Tests Passed: {passed}/{total}")
-print(f"Pass Rate: {single_turn_summary['pass_rate']}")
-print(f"Average Latency: {avg_latency} ms")
-print(f"Average Tokens: {avg_total_tokens}")
-print()
-
-# Multi-turn summary
-multi_turn_passed = 0
-multi_turn_total = 0
-
-for test in multi_turn_results:
-    for turn in test["turns"]:
-        multi_turn_total += 1
-        if turn["tool_ok"] and turn["response_ok"]:
-            multi_turn_passed += 1
-
-multi_turn_summary = {
-    "passed": multi_turn_passed,
-    "total": multi_turn_total,
-    "pass_rate": f"{(multi_turn_passed/multi_turn_total)*100:.1f}%" if multi_turn_total > 0 else "N/A"
-}
-
-print("=" * 50)
-print("MULTI-TURN TEST SUMMARY")
-print("=" * 50)
-print(f"Turns Passed: {multi_turn_passed}/{multi_turn_total}")
-print(f"Pass Rate: {multi_turn_summary['pass_rate']}")
-print()
-
-# Overall summary
-overall_passed = passed + multi_turn_passed
-overall_total = total + multi_turn_total
-print("=" * 50)
-print("OVERALL TEST SUMMARY")
-print("=" * 50)
-print(f"Total Passed: {overall_passed}/{overall_total}")
-print(f"Overall Pass Rate: {(overall_passed/overall_total)*100:.1f}%" if overall_total > 0 else "N/A")
+**Ambiguity Handling**: How does the agent behave when inputs are unclear?
+```
+Input: "What about Apple?"
+Expected: Might ask for clarification or make reasonable assumptions
 ```
 
-**Example output:**
+#### Multi-Step Cases
 
+Multi-step test cases require the agent to chain multiple tool calls to accomplish a goal.
+
+**Sequential Operations**: The agent must perform operations in order, where each step depends on previous results.
 ```
-==================================================
-SINGLE-TURN TEST SUMMARY
-==================================================
-Tests Passed: 4/4
-Pass Rate: 100.0%
-Average Latency: 1971.31 ms
-Average Tokens: 44.75
-
-==================================================
-MULTI-TURN TEST SUMMARY
-==================================================
-Turns Passed: 5/5
-Pass Rate: 100.0%
-
-==================================================
-OVERALL TEST SUMMARY
-==================================================
-Total Passed: 9/9
-Overall Pass Rate: 100.0%
+Input: "Get the weather in Boston, then find the stock price for Tesla"
+Expected: 
+  Step 1: Calls get_current_weather with location="Boston"
+  Step 2: Calls get_stock_price with ticker="TSLA"
 ```
 
-#### Metrics Interpretation
+**Conditional Logic**: The agent must make decisions based on intermediate results.
+```
+Input: "If the weather in Seattle is rainy, get me the stock price for umbrella companies"
+Expected: Calls get_current_weather first, then conditionally calls get_stock_price
+```
 
-**Pass Rate**: This metric indicates the percentage of tests that meet all success criteria. While this is the primary indicator of correctness, it should be analyzed in conjunction with other metrics.
+#### Multi-Turn Cases
 
-**Average Latency**: This metric directly impacts user experience. If average latency increases from 2 seconds to 5 seconds following a model update, this represents a performance regression even if accuracy remains constant.
+Multi-turn test cases verify that the agent maintains context across a conversation.
 
-**Average Tokens**: This metric correlates directly with operational costs. If a change to prompting strategy doubles average token count, you must evaluate whether quality improvements justify the increased cost.
+**Follow-up Questions**: Can the agent understand references to previous context?
+```
+Turn 1: "What's the weather in London?"
+Expected: Calls get_current_weather with location="London"
 
-These metrics should be tracked over time. Implement alerts for scenarios where pass rate drops below acceptable thresholds or when latency increases significantly. This approach enables early detection of regressions.
+Turn 2: "How about in Tokyo?"
+Expected: Calls get_current_weather with location="Tokyo"
+(Tests that agent understands "How about" refers to weather)
+```
 
-## What We've Built
+**Topic Switching**: Can the agent handle conversation shifts?
+```
+Turn 1: "What's the weather in Boston?"
+Expected: Calls get_current_weather with location="Boston"
 
-Let's recap what we now have:
+Turn 2: "Now tell me the IBM stock price"
+Expected: Calls get_stock_price with ticker="IBM"
+(Tests that agent doesn't get stuck in "weather mode")
+```
 
-**Data structures** that cleanly represent tool calls and test results  
-**Evaluation helpers** for both trajectory and response validation  
-**A test runner** that executes the agent and captures everything we need  
-**Single-turn tests** that verify basic functionality for each tool  
-**Multi-turn tests** that verify conversation handling  
-**Summary metrics** that give us the big picture
+**Anaphora Resolution**: Can the agent resolve pronouns and references?
+```
+Turn 1: "Get me Apple's stock price"
+Expected: Calls get_stock_price with ticker="AAPL"
 
-This is a complete testing framework. You can now:
+Turn 2: "What was it yesterday?"
+Expected: Calls get_stock_price with ticker="AAPL", date=<yesterday>
+(Tests that agent understands "it" refers to Apple stock)
+```
 
-- Add new test cases as you add new tools or identify edge cases
-- Compare different models by running the same tests against multiple agents
-- Catch regressions by running tests in CI/CD before deployment
-- Track performance over time with your latency and token metrics
+### Evaluation Metrics
+
+Metrics provide quantitative measures of agent performance. Different metrics capture different aspects of quality.
+
+1. **Tool Selection Accuracy**: What percentage of test cases result in the correct tool being called? This is often the most critical metric for tool-calling agents.
+
+2. **Parameter Extraction Accuracy**: When the right tool is called, are the parameters correct? Partial credit might be awarded calling the weather API with the right city but wrong units is better than calling the wrong API entirely.
+
+3. **Response Quality**: Does the final response appropriately communicate the tool results to the user? This is harder to measure automatically but critical for user experience.
+
+4. **Latency**: How long does the agent take to respond? Even correct answers that arrive too slowly fail to meet production requirements.
+
+5. **Token Efficiency**: How many tokens does the agent consume per request? This directly impacts operational costs.
+
+6. **Success Rate Over Conversation Length**: Do multi-turn conversations degrade in quality as they get longer? Some agents perform well initially but lose context after several turns.
+
+7. **Error Recovery**: When tool calls fail, does the agent handle errors gracefully? A good agent should inform the user and potentially suggest alternatives.
+
+### Validation Mechanisms
+
+Once you've defined test cases and metrics, you need mechanisms to validate whether the agent passed or failed.
+
+#### Programmatic Matching for Tool Calls
+
+Tool call validation can often be done programmatically since the structure is well-defined.
+
+**Exact Matching**: For high-stakes tools (those that write data, make purchases, etc.), exact matching is appropriate. The tool name must match exactly, and all required parameters must be present with correct values.
+
+**Fuzzy Matching**: For lower-stakes tools, some flexibility might be acceptable. "New York" vs "New York City" might both be valid for a weather query. Date formats "2025-01-15" vs "January 15, 2025" represent the same information.
+
+**Schema Validation**: Beyond checking values, ensure that parameters conform to expected types and constraints. A stock ticker should be a string of 1-5 uppercase letters, not a number or lowercase text.
+
+The choice between strict and lenient matching depends on your use case. An agent booking flights needs exact matching. An agent fetching weather for general conversation might allow more flexibility.
+
+#### LLM-as-a-Judge for Response Evaluation
+
+While tool calls have clear structure, final responses are natural language and harder to evaluate automatically.
+
+**Substring Matching**: The simplest approach checks whether expected keywords appear in the response. If testing a weather query for Miami, verify "Miami" appears in the response. This is fast and deterministic but catches only obvious failures.
+
+**Semantic Similarity**: Compare the agent's response to reference responses using embedding models. Responses that are semantically similar to good examples score higher. This allows for natural variation in phrasing while ensuring key information is present.
+
+**LLM-as-a-Judge**: Use another LLM to evaluate response quality. Provide the judge with the user query, tool results, and agent response, then ask it to score factors like accuracy, completeness, and helpfulness. This is the most flexible approach but introduces its own non-determinism and cost.
+
+**Human Evaluation**: For the most critical use cases or when developing your evaluation strategy, human review remains the gold standard. Humans can catch subtle issues that automated approaches miss, though this doesn't scale well.
+
+A pragmatic approach combines multiple validation mechanisms. Use programmatic matching for tool calls, substring matching for basic response validation, and periodic human review to catch edge cases and inform improvements to automated evaluation.
+
+## Performance Metrics and Tracking
+
+Beyond pass/fail status for individual test cases, tracking metrics over time reveals trends and regressions.
+
+**Pass Rate Trends**: If your pass rate drops from 95% to 85% after a model update, that's a signal to investigate, even if 85% seems acceptable in isolation.
+
+**Latency Distribution**: Average latency matters, but so does variance. An agent with 2-second average latency but occasional 30-second outliers creates a poor user experience.
+
+**Cost Trends**: Token usage multiplied by pricing determines operational costs. Track this metric to ensure costs remain sustainable as usage scales.
+
+**Error Type Distribution**: Categorize failures by type (wrong tool, wrong parameters, poor response quality, etc.). This helps prioritize improvements. If 80% of failures are parameter extraction errors, that's where to focus optimization.
+
+Establish baselines for these metrics with your initial agent version, then monitor for significant deviations. Automated alerts when metrics cross thresholds enable rapid response to issues.
+
+## Evaluation Approaches Not Covered
+
+This guide focuses on tool-calling agents, but other agent types require specialized evaluation approaches:
+
+**Retrieval Evaluation for RAG Agents**: RAG systems need metrics like retrieval precision (what percentage of retrieved documents are relevant) and recall (what percentage of relevant documents were retrieved). The [RAGAS framework](https://docs.ragas.io/) provides comprehensive evaluation metrics for RAG applications.
+
+**Code Execution Testing**: Code generation agents require running generated code in sandboxed environments and verifying outputs match expected results, along with static analysis for security vulnerabilities.
+
+**Long-Context Evaluation**: Agents working with very long conversations or documents need specialized tests for maintaining coherence and accuracy as context length increases.
+
+## Practical Considerations
+
+As you design your evaluation strategy, keep these practical considerations in mind:
+
+**Start Simple**: Begin with a small set of critical test cases using basic validation mechanisms. Expand coverage as you understand your agent's failure modes better.
+
+**Version Control Your Tests**: Test cases are as important as your code. Track them in version control so you can correlate agent changes with evaluation results.
+
+**Automate Where Possible**: Manual testing doesn't scale. Automate test execution so you can run your suite frequently—ideally on every code change.
+
+**Balance Coverage and Efficiency**: Comprehensive coverage is ideal, but running 10,000 test cases on every change might be impractical. Identify a core set of smoke tests that run on every change, with more extensive testing on a schedule.
+
+**Iterate on Your Evaluation Strategy**: Your first evaluation approach won't be perfect. As you discover new failure modes or edge cases, add tests that would have caught them. Your evaluation suite should evolve alongside your agent.
 
 ## Next Steps
 
-This framework provides a solid foundation for production agent testing. Consider the following enhancements for production systems:
+Now that you understand the concepts behind agent evaluation, you're ready to implement testing for your own agents.
 
-**Expand Test Coverage**: Add edge case testing to validate error handling. Test scenarios such as non-existent cities for weather queries or invalid date formats for stock queries. Comprehensive testing should cover failure modes in addition to success paths.
+**Implement a Test Framework**: The companion code example in [Function_Calling_Agent_TDD.ipynb](./Function_Calling_Agent_TDD.ipynb) demonstrates these concepts in practice with a working implementation for tool-calling agents built with LangGraph and Granite.
 
-**Advanced Evaluation Methods**: For responses where substring matching proves insufficient, implement LLM-as-a-judge evaluation or semantic similarity scoring for responses that should be semantically similar but not textually identical.
+**Expand Test Coverage**: Start with basic test cases covering core functionality, then add edge cases, error conditions, and multi-turn scenarios as you identify gaps.
 
-**CI/CD Integration**: Automate test execution on every pull request. Configure build failures when pass rate drops below defined thresholds. This practice catches regressions before they reach production environments.
+**Integrate with Development Workflow**: Run tests automatically on pull requests to catch regressions before they reach production. Fail builds when critical tests fail or when metrics degrade significantly.
 
-**Model Comparison Framework**: When evaluating new model versions, execute the complete test suite against both models and compare results systematically. Base decisions on objective data rather than subjective assessment.
+**Compare Models and Approaches**: Use your evaluation suite to make objective decisions when comparing different models, prompting strategies, or architectural patterns. Let data guide your choices.
 
-**Metrics Tracking System**: Store test results in a database and construct monitoring dashboards. Track trends such as gradually increasing latency or degrading pass rates over time.
+**Monitor Production Performance**: Beyond development testing, track the same metrics in production. Real user interactions often reveal issues that test suites miss.
 
 ## Conclusion
 
-Testing AI agents requires different approaches than traditional software testing, but maintains equal importance. The non-deterministic nature of LLMs can make manual testing seem sufficient, but this approach does not scale.
+Evaluation is not a one-time activity but an ongoing practice. As your agent evolves, your evaluation strategy should evolve with it. New features require new tests. Discovered bugs should translate into test cases that prevent regressions.
 
-The testing framework presented in this guide provides:
-- Confidence that agents behave as expected
-- Early detection of breaking changes
-- Objective data for comparing alternatives
-- A foundation for continuous improvement
+The investment in robust evaluation pays dividends throughout your agent's lifecycle. It enables confident iteration, catches issues early, and provides the data needed to make informed decisions about model selection, architecture, and feature development.
 
-Begin with the tests defined in this guide, then expand coverage as you discover new edge cases or add capabilities. This systematic approach ensures that core use cases remain validated through agent evolution.
+Most importantly, systematic evaluation is what separates prototype demonstrations from production-ready systems. If you can't measure whether your agent works correctly, you can't confidently deploy it to real users.
 
-The complete implementation of this testing framework is available in the Granite Kitchen repository for reference and adaptation to your specific use cases.
+Start with the fundamentals covered in this guide, implement testing incrementally, and continuously refine your approach based on what you learn. The path to production-ready agents begins with the confidence that comes from thorough evaluation.
