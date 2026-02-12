@@ -25,7 +25,7 @@ Learn more about how to [effectively build AI agents with Granite](building_agen
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 1. [Agent Test Driven Development](recipes/Agent_TDD/Function_Calling_Agent_TDD.ipynb)
-   <a target="_blank" href="https://colab.research.google.com/drive/15ZHqd13PcW9LKaQiR4JfxBIpr2OsKsFj?usp=sharing">
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Agent_TDD/Function_Calling_Agent_TDD.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 
