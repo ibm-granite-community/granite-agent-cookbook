@@ -2,3 +2,4 @@ recipes/Function_Calling/Function_Calling_Agent.ipynb
 recipes/ReAct/ReAct_Agent.ipynb
 recipes/ToolRAG/ToolRAG_Agent.ipynb
 recipes/Plan_Solve/Plan_Solve_Agent.ipynb
+recipes/Route_and_Solve/Route_and_Solve_Agent.ipynb
