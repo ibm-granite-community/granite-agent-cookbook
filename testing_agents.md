@@ -208,7 +208,8 @@ Metrics provide quantitative measures of agent performance. Different metrics ca
   - **Exact matching**: Use for high-stakes tools (writes data, makes purchases). Tool name and required parameters must match exactly.
   - **Fuzzy matching**: Use for lower-stakes tools where some flexibility is acceptable (e.g., “New York” vs “New York City”).
   - **Schema validation**: Ensure parameters conform to expected types and constraints (e.g., ticker is 1–5 uppercase letters).
-  - Choose strict vs. lenient matching based on your use case.
+  - **LLM-as-a-judge for tool calls**: When parameters are dynamic or context-dependent, deterministic matching becomes brittle. An LLM judge can evaluate whether the selected tool and extracted parameters are semantically correct given the user's intent. This is especially useful for tools that accept free-text arguments (e.g., a `search_documents` tool with a `query` parameter), date/time expressions that can be phrased many ways, or parameters derived from multi-turn context where the "correct" value isn't a single fixed string. The judge prompt should include the user query, the expected tool behavior, and the actual tool call, then ask whether the call is appropriate. This adds cost per evaluation but scales better than enumerating every valid parameter variant.
+  - Choose strict vs. lenient matching based on your use case. Prefer deterministic checks for well-structured parameters and reserve LLM-as-a-judge for parameters where valid values are open-ended or hard to enumerate.
 
 - **Response evaluation (LLM-as-a-judge and alternatives)**
   - Tool calls are structured; final responses are natural language and harder to evaluate deterministically.
@@ -264,7 +265,7 @@ Now that you understand the concepts behind agent evaluation, you're ready to im
 
 **Expand Test Coverage**: Start with basic test cases covering core functionality, then add edge cases, error conditions, and multi-turn scenarios as you identify gaps.
 
-**Integrate with Development Workflow**: Run tests automatically on pull requests to catch regressions before they reach production. Fail builds when critical tests fail or when metrics degrade significantly.
+**Integrate with Development Workflow**: Run tests automatically on pull requests to catch regressions before they reach production. Fail builds when critical tests fail or when metrics degrade significantly. For a deeper dive into CI/CD pipelines tailored for AI agents, stay tuned for our upcoming guide on CI/CD for Agents.
 
 **Compare Models and Approaches**: Use your evaluation suite to make objective decisions when comparing different models, prompting strategies, or architectural patterns. Let data guide your choices.
 
