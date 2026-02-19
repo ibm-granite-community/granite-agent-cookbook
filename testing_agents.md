@@ -50,7 +50,7 @@ A well-defined test case specifies three components:
 
 For a weather agent with `get_current_weather` and `get_stock_price` tools, a basic test case might look like:
 
-```
+```text
 Input: "What is the weather in Miami?"
 Expected Tool: get_current_weather
 Expected Parameters: {"location": "Miami"}
@@ -66,7 +66,8 @@ Different test patterns validate different capabilities. A comprehensive evaluat
 Single-step test cases verify that the agent can handle straightforward requests that require exactly one tool call.
 
 - **Basic functionality**: Does the agent invoke the correct tool for simple, unambiguous requests?
-  ```
+
+  ```text
   Input: "Get me the stock price for IBM"
   Expected Tool: get_stock_price
   Expected Parameters: {"ticker": "IBM"}
@@ -74,7 +75,8 @@ Single-step test cases verify that the agent can handle straightforward requests
   ```
 
 - **Parameter extraction**: Can the agent extract multiple parameters correctly?
-  ```
+
+  ```text
   Input: "What were Apple stock prices on January 15, 2025?"
   Expected Tool: get_stock_price
   Expected Parameters: {"ticker": "AAPL", "date": "2025-01-15"}
@@ -82,7 +84,8 @@ Single-step test cases verify that the agent can handle straightforward requests
   ```
 
 - **Parameter normalization**: Does the agent normalize inputs to expected formats?
-  ```
+
+  ```text
   Input: "Weather in NYC"
   Expected Tool: get_current_weather
   Expected Parameters: {"location": "New York City"}
@@ -90,7 +93,8 @@ Single-step test cases verify that the agent can handle straightforward requests
   ```
 
 - **Ambiguity handling**: How does the agent behave when inputs are unclear?
-  ```
+
+  ```text
   Input: "What about Apple?"
   Expected Behavior: Ask for clarification (stock price vs. weather vs. something else), or make a clearly stated assumption
   Success Criteria: Agent does not call an unrelated tool with fabricated parameters
@@ -101,7 +105,8 @@ Single-step test cases verify that the agent can handle straightforward requests
 Multi-step test cases require the agent to chain multiple tool calls to accomplish a goal.
 
 - **Sequential operations**: The agent must perform operations in order, where each step depends on previous results.
-  ```
+
+  ```text
   Input: "Get the weather in Boston, then find the stock price for Tesla"
   Step 1 Expected Tool: get_current_weather
   Step 1 Expected Parameters: {"location": "Boston"}
@@ -111,7 +116,8 @@ Multi-step test cases require the agent to chain multiple tool calls to accompli
   ```
 
 - **Conditional logic**: The agent must make decisions based on intermediate results.
-  ```
+
+  ```text
   Input: "If the weather in Seattle is rainy, get me the stock price for umbrella companies"
   Step 1 Expected Tool: get_current_weather
   Step 1 Expected Parameters: {"location": "Seattle"}
@@ -124,7 +130,8 @@ Multi-step test cases require the agent to chain multiple tool calls to accompli
 Multi-turn test cases verify that the agent maintains context across a conversation.
 
 - **Follow-up questions**: Can the agent understand references to previous context?
-  ```
+
+  ```text
   Turn 1 Input: "What's the weather in London?"
   Turn 1 Expected Tool: get_current_weather
   Turn 1 Expected Parameters: {"location": "London"}
@@ -138,7 +145,8 @@ Multi-turn test cases verify that the agent maintains context across a conversat
   ```
 
 - **Topic switching**: Can the agent handle conversation shifts?
-  ```
+
+  ```text
   Turn 1 Input: "What's the weather in Boston?"
   Turn 1 Expected Tool: get_current_weather
   Turn 1 Expected Parameters: {"location": "Boston"}
@@ -152,7 +160,8 @@ Multi-turn test cases verify that the agent maintains context across a conversat
   ```
 
 - **Anaphora resolution**: Can the agent resolve pronouns and references?
-  ```
+
+  ```text
   Turn 1 Input: "Get me Apple's stock price"
   Turn 1 Expected Tool: get_stock_price
   Turn 1 Expected Parameters: {"ticker": "AAPL"}
@@ -169,7 +178,7 @@ Multi-turn test cases verify that the agent maintains context across a conversat
 
 Metrics provide quantitative measures of agent performance. Different metrics capture different aspects of quality.
 
-**Metrics**
+### Metrics
 
 - **Tool selection accuracy**
   - What percentage of test cases result in the correct tool being called?
@@ -179,7 +188,7 @@ Metrics provide quantitative measures of agent performance. Different metrics ca
   - When the right tool is called, are the parameters correct?
   - Partial credit can be meaningful (e.g., right city but wrong units is better than calling the wrong tool).
 
-  *Note: For an example of representing tool calls as an AST for standardized evaluation, see the “Metrics” section here: https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html#metrics*
+  *Note: For an example of representing tool calls as an AST for standardized evaluation, see the "Metrics" section here: <https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html#metrics>*
 
 - **Response quality**
   - Does the final response appropriately communicate the tool results to the user?
@@ -201,7 +210,7 @@ Metrics provide quantitative measures of agent performance. Different metrics ca
   - When tool calls fail, does the agent handle errors gracefully?
   - A good agent should inform the user and potentially suggest alternatives.
 
-**Validation mechanisms**
+### Validation mechanisms
 
 - **Programmatic matching for tool calls**
   - Tool call validation is often programmatic because the structure is well-defined.
