@@ -232,7 +232,7 @@ Also this setting can empower use cases where there are longer reasoning traces 
 
 In production settings, this approach can offer a more simplified human-in-the-loop pattern by allowing the user to validate generated plans before execution.
 
-**Link to example implementation:** *Coming soon*
+**Link to example implementation: [Plan and Solve Agent recipe](recipes/Plan_Solve/Plan_Solve_Agent.ipynb)**
 
 </details>
 
@@ -265,7 +265,7 @@ This approach is effective when there is a natural clustering of tools which can
 
 This approach also improves performance when there may be a large set of tools available. Since each sub-agent only chooses from a subset of the tools, it is less likely to select an incorrect tool if the Router has effectively done its job.
 
-**Link to example implementation:** *Coming soon*
+**Link to example implementation: [Route and Solve Agent recipe](recipes/Route_and_Solve/Route_and_Solve_Agent.ipynb)**
 
 </details>
 
@@ -296,7 +296,7 @@ This approach is effective when you have a large set of tools and not all are re
 
 This dynamic filtering is different to the Route and Solve Agents which is a static grouping defined by the agent dev at build time. This approach instead dynamically filters at runtime based on the incoming query.
 
-**Link to example implementation:** *Coming soon*
+**Link to example implementation: [Tool RAG Agent recipe](recipes/ToolRAG/ToolRAG_Agent.ipynb)**
 
 </details>
 
@@ -331,7 +331,7 @@ This approach is suitable for scenarios that have a small to medium list of tool
 
 Accompanying this approach with ToolRAG can enable the extension of this agent to work with more tools and more generic utterances.
 
-**Link to example implementation:** *Coming soon*
+**Link to example implementation: [ReAct Agent recipe](recipes/ReAct/ReAct_Agent.ipynb)**
 
 </details>
 
