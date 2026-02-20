@@ -18,7 +18,7 @@ In this guide, we assume some knowledge of the following topics (if you need rec
 
 - Basic understanding of what are AI Agents. For a quick refresher, check out the post here: [What are AI agents?](https://www.ibm.com/think/topics/ai-agents#7281535)
 
-- Basic understanding of Retreival Augmented Generation (RAG). For a recap look here: [What is retrieval-augmented generation?](https://research.ibm.com/blog/retrieval-augmented-generation-RAG)
+- Basic understanding of Retrieval Augmented Generation (RAG). For a recap look here: [What is retrieval-augmented generation?](https://research.ibm.com/blog/retrieval-augmented-generation-RAG)
 
 ## 1. :hammer: Building Your Agent
 
@@ -45,7 +45,7 @@ The flow for an FC Agent is:
 4. Upon completion, the result of the tool execution is sent back to the LLM with the original query.
 5. Repeat step 3 until a final answer is received.
 
-![FC Agent Flow Example](./images/fc_agent_flow_example.png)
+![FC Agent Flow Example](images/fc_agent_flow_example.png)
 *FC Agent Flow Example*
 
 :exclamation: A common misconception is that the LLM underlying the Agent is able to execute tools, when in fact the LLM is only selecting a tool and the tool parameters to execute based on the query. The tool execution is performed by the program supplementing the LLM invocations.
@@ -96,7 +96,7 @@ curl -X 'POST' \
       }
     }
   ],
-  "model": "ibm-granite/granite-3-3-8b-instruct"
+  "model": "ibm-granite/granite-4-h-small"
 }'
 ```
 
@@ -107,7 +107,7 @@ curl -X 'POST' \
   "id": "chatcmpl-d19a2a76b2e04a82ac89af71343b54f6",
   "object": "chat.completion",
   "created": 1756821450,
-  "model": "ibm-granite/granite-3-3-8b-instruct",
+  "model": "ibm-granite/granite-4-h-small",
   "choices": [
     {
       "index": 0,
@@ -142,7 +142,7 @@ curl -X 'POST' \
 
 Note the `tool_calls` in the response object identifying the tool the model has selected to be invoked based on the query.
 
-:rocket: **For a complete introduction and code to see a Function Calling Agent implemented in LangGraph, see the [Function Calling Agent recipe](https://github.com/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Function_Calling/Function_Calling_Agent.ipynb).**
+:rocket: **For a complete introduction and code to see a Function Calling Agent implemented in LangGraph, see the [Function Calling Agent recipe](recipes/Function_Calling/Function_Calling_Agent.ipynb).**
 
 ## 2. :microscope: Testing Your Agent
 
@@ -174,7 +174,7 @@ The evaluation typically follows two sections:
 
 ### Agent response evaluation
 
-**Agent response evaluation** answers the following: did the agent respond with the Natural Language (NL) response that was expected? In this case the evaluation is typically done using a LLM-as-a-Judge to enable for NL comparisons between expected and real responses. Other strategies or metrics which can be used include [Semantic Similarity](https://www.ibm.com/think/topics/cosine-similarity), [BLEU](https://dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-bleu-metric.html?context=wx), [ROUGE](dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-rouge-metric.html?context=wx) scores.
+**Agent response evaluation** answers the following: did the agent respond with the Natural Language (NL) response that was expected? In this case the evaluation is typically done using a LLM-as-a-Judge to enable for NL comparisons between expected and real responses. Other strategies or metrics which can be used include [Semantic Similarity](https://www.ibm.com/think/topics/cosine-similarity), [BLEU](https://dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-bleu-metric.html?context=wx), [ROUGE](https://dataplatform.cloud.ibm.com/docs/content/wsj/model/wxgov-rouge-metric.html?context=wx) scores.
 
 ### Other evaluations
 
@@ -195,7 +195,7 @@ Following this review, Tool and Parameter descriptions should be updated to make
 
 In some case cases, the FC Agent architecture may still prove to be missing accuracy requirements. This can occur for a range of reasons. *For example, if you have a large number of tools in your tool set (50+), if your tools are particularly complex (large number of input parameters) or if the queries require a high number of reasoning steps.* In such setups we can adapt our agent and augment it with more LLM powered nodes and step closer to the requirements for the agent. In this section we cover a few of those architectures and when you may consider using them.
 
-Click through the collapsable sections to learn more:
+Click through the collapsible sections to learn more:
 
 <details>
 <summary>Plan-and-Solve Agents</summary>
@@ -214,7 +214,7 @@ Once the FC node has executed the plan, the agent may or may not invoke the plan
 
 - Plan can be extracted and observed.
 
-- Planning evokes thinking/reasoning behaviours, often leading to higher accuracy.
+- Planning evokes thinking/reasoning behaviors, often leading to higher accuracy.
 
 - The FC node does not have to do the complex task of decision-making, it only has to load up the prescribed tool-call objects.
 
@@ -251,7 +251,7 @@ This approach can be thought of as a Router which routes to multiple function ca
 
 - Subagent architectures enable conceptual segmentation and reduce likelihood of incorrect tool selection.
 
-- Easily extendible in a modular way with new subagents as required.
+- Easily extendable in a modular way with new subagents as required.
 
 **Cons:**
 
@@ -276,7 +276,7 @@ This approach also improves performance when there may be a large set of tools a
 
 **Description:**
 
-ToolRAG Agents operate by first doing RAG on the set of available tools based on the query and only show a susbet of the toolset to the model to select from for a given query. This pre-filtering approach reduces the likelihood of the model choosing the wrong tools as it is already being shown a smaller set of relevant tools to pick from.
+ToolRAG Agents operate by first doing RAG on the set of available tools based on the query and only show a subset of the toolset to the model to select from for a given query. This pre-filtering approach reduces the likelihood of the model choosing the wrong tools as it is already being shown a smaller set of relevant tools to pick from.
 
 **Pros:**
 
@@ -288,7 +288,7 @@ ToolRAG Agents operate by first doing RAG on the set of available tools based on
 
 **Cons:**
 
-- Tool prefiltering may not raise up the relevant tool for model to select from.
+- Tool pre-filtering may not raise up the relevant tool for model to select from.
 
 **When to use:**
 
@@ -341,6 +341,6 @@ Experiments with these agents can be facilitated again by the [Test Your Agent](
 
 ## Conclusion
 
-In this blog we have introduced a guide for developing agents from prototype to production. A key characterisitc of product development is always a well defined testing strategy. Teams which use Test Driven Development (TDD)  can benefit from improved code simplicity and robustness. In this blog we introduce the equivalent for the development of agentic or LLM-powered applications, and present how to use test-driven ideology to motivate enhancements in your agent architectures.
+In this blog we have introduced a guide for developing agents from prototype to production. A key characteristic of product development is always a well defined testing strategy. Teams which use Test Driven Development (TDD)  can benefit from improved code simplicity and robustness. In this blog we introduce the equivalent for the development of agentic or LLM-powered applications, and present how to use test-driven ideology to motivate enhancements in your agent architectures.
 
 We believe that agents do not have to be complicated black-boxes for operation. Designing agents with observability and explainability in mind is the basis for a strong agent to be taken to market or deployed in real world scenarios.
