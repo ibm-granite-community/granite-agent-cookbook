@@ -32,6 +32,10 @@ Learn more about how to [effectively build AI agents with Granite](building_agen
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Agent_TDD/Function_Calling_Agent_TDD.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
+1. [Observability and Testing for Agents using LangFuse](recipes/Tracing/Tracing_Agent.ipynb)
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Tracing/Tracing_Agent.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
 
 ## Build Status
 
