@@ -10,12 +10,12 @@ If you haven't already built a function-calling agent, check out our previous gu
 
 In traditional software development, Test-Driven Development (TDD) has become a cornerstone practice. You write tests that define expected behavior, then build code that satisfies those tests. This same principle applies to AI agents, but with added complexity due to their non-deterministic nature.
 
-Bringing confidence that your agent does what is expected is not optional, it's a necessity for productionizing agents. Here's why systematic evaluation matters:
+Bringing confidence that your agent does what is expected is not optional, it's a necessity for productizing agents. Here's why systematic evaluation matters:
 
-**Regression Detection** - Know immediately when prompt changes, model updates, or tool modifications break existing functionality  
-**Objective Comparison** - Make data-driven decisions when comparing models, prompting strategies, or architectural approaches  
-**Production Readiness** - Deploy with confidence knowing core use cases work reliably  
-**Debugging Efficiency** - Reproduce and diagnose issues systematically rather than relying on manual testing  
+**Regression Detection** - Know immediately when prompt changes, model updates, or tool modifications break existing functionality
+**Objective Comparison** - Make data-driven decisions when comparing models, prompting strategies, or architectural approaches
+**Production Readiness** - Deploy with confidence knowing core use cases work reliably
+**Debugging Efficiency** - Reproduce and diagnose issues systematically rather than relying on manual testing
 **Living Documentation** - Test cases serve as executable specifications of how your agent should behave
 
 The stakes are even higher than traditional software. An agent that calls the wrong API, extracts incorrect parameters, or misinterprets user intent can have real-world consequences - financial transactions, data modifications, or incorrect information delivery.
@@ -44,8 +44,8 @@ Tool-calling agents make decisions about which functions to invoke and what para
 
 A well-defined test case specifies three components:
 
-**User Input**: The query or prompt that triggers the agent  
-**Expected Behavior**: What the agent should do in response  
+**User Input**: The query or prompt that triggers the agent
+**Expected Behavior**: What the agent should do in response
 **Success Criteria**: How to determine if the agent performed correctly
 
 For a weather agent with `get_current_weather` and `get_stock_price` tools, a basic test case might look like:
