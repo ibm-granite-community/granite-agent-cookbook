@@ -26,7 +26,6 @@ In production, the agent that behaved reliably in staging began returning subtly
 
 Traditional CI/CD breaks down here because agent behavior is not defined by a single code path. It emerges from prompts, model weights, tool definitions, memory state, and runtime parameters. Any one can shift behavior in ways the pipeline never sees.
 
-
 [Industry data](https://www.virtuosoqa.com/post/agentic-ai-continuous-integration-autonomous-testing-devops) puts the cost of inadequate CI/CD coverage at $4.2M annually in delayed releases alone, and 67% of production incidents trace back to testing gaps. For agent systems, those gaps are structural, as they're baked into a pipeline model that wasn't designed for this kind of system.
 
 Fortunately, this is a solvable engineering challenge. It just requires rebuilding your pipeline with a different mental model. One that treats non-determinism as a first-class constraint rather than an edge case. This guide walks through that rebuild, layer by layer: how to version and manage the artifacts that define agent behavior, how to test outputs that can't be asserted like traditional return values, how modern protocols like MCP and A2A change the deployment picture, and how to build the observability that lets you actually understand what your agent is doing in production.
