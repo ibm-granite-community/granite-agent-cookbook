@@ -54,7 +54,7 @@ Contradictory information accumulates in the context. Tightly coupled multi-agen
 | Strategy | Fixes |
 | --- | --- |
 | FIFO / Rolling Window | Distraction |
-| Compaction / Summarisation | Distraction |
+| Compaction / summarization | Distraction |
 | Dynamic Tool Selection | Confusion |
 | Context Pruning | Confusion, Poisoning |
 | Structured Note-Taking | Distraction, Clash |
@@ -99,7 +99,7 @@ The key distinction from pruning (Strategy 4): summarization condenses all conte
 | --- | --- |
 | ✅ Preserves compressed form of all history | ❌ Risk of information loss , fine-tune or carefully prompt the compaction model |
 | ✅ Agent sees a coherent narrative, not an abrupt cutoff | ❌ Adds latency and cost at compaction time |
-| ✅ Works well for long-running conversational agents | ❌ Manus recommends offloading over summarisation for tool-heavy agents |
+| ✅ Works well for long-running conversational agents | ❌ Manus recommends offloading over summarization for tool-heavy agents |
 
 ---
 
@@ -149,7 +149,7 @@ This mirrors how humans work: we take notes during research, then synthesize tho
 | --- | --- |
 | ✅ Agent remains aware of its own notes without bloating the message list | ❌ Requires the agent to use the write tool, prompt engineering is essential |
 | ✅ Rewriting the plan (Manus pattern) keeps the agent on track for long tasks | ❌ Scratchpad is within-session only (see Strategy 6 for cross-session persistence) |
-| ✅ Avoids information loss unlike summarisation, the agent chooses what to keep | ❌ Poor agent instruction can result in under-used scratchpad |
+| ✅ Avoids information loss unlike summarization, the agent chooses what to keep | ❌ Poor agent instruction can result in under-used scratchpad |
 
 ---
 
@@ -166,7 +166,7 @@ This is the approach taken by the Anthropic multi-agent research system for task
 | ✅ No information loss : full content is always recoverable | ❌ Requires filesystem access or object storage |
 | ✅ Works for tasks that span multiple agent runs | ❌ Agent must be prompted to use file tools consistently |
 | ✅ Selective reading (grep) keeps context focused on what's needed now | ❌ File management adds coordination overhead for multi-agent systems |
-| ✅ Preferred by Manus over summarisation for tool-heavy agents | |
+| ✅ Preferred by Manus over summarization for tool-heavy agents | |
 
 ---
 
