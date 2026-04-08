@@ -5,6 +5,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
 ## Recipes
 
 Learn more about how to [effectively build AI agents with Granite](building_agents.md).
+Learn about [efficient prompting of small language models](prompting_slms.md).
 
 ### Getting Started
 
