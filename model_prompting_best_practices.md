@@ -1,4 +1,4 @@
-# Prompting with SLM: Best Practices for Accurate Agent Responses
+# Prompting SLMs for Agentic Applications: Best Practices for Accurate Agent Responses
 
 ## Introduction
 
@@ -43,7 +43,6 @@ Just like telling someone "Don't look behind you" is the surest way to have them
 When system prompts become too complex, decompose them into smaller, focused sections:
 
 ```markdown
-## Role Definition
 You are a technical assistant specializing in code analysis.
 
 ## Core Capabilities
@@ -71,7 +70,97 @@ Organize your system prompt with clear sections:
 2. **Capabilities**: List what the model can do
 3. **Guidelines**: Provide behavioral instructions using positive framing
 4. **Format Requirements**: Specify output structure expectations
-5. **Examples**: Include 1-2 concrete examples when helpful
+5. **Examples**: Include 1-2 concrete examples when helpful (few-shot prompting)
+
+Few-shot prompting can provides concrete examples that demonstrate desired behavior patterns. This is particularly effective for smaller models that benefit from explicit demonstrations.
+
+#### Example: Information Extraction
+
+This example demonstrates how few-shot examples significantly improve structured output quality.
+
+**Task**: Extract a person's 'name, age, occupation, and location from text and return it as JSON.
+
+---
+
+##### Approach 1: Zero-Shot (No Examples)
+
+**System Prompt:**
+```markdown
+You are a technical assistant specializing in information extraction.
+
+## Core Capabilities
+- Extract person_name, age, occupation and location from a given text.
+- Return the information in JSON format.
+- If a given text does not contain the required information, leave value empty.
+
+## Response Format
+Return only valid JSON.
+```
+
+**Input:**
+```
+Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
+```
+
+**Output:**
+```text
+"```json\n{\n  \"person_name\": \"Sarah Chen\",\n  \"age\": 34,\n  \"occupation\": \"software engineer\",\n  \"location\": \"Toronto, Canada\"\n}\n```"
+```
+
+**Issue**: The model wraps the JSON in markdown code blocks (` ```json ... ``` `), violating the "valid JSON only" requirement.
+
+---
+
+##### Approach 2: Few-Shot (With Examples)
+
+**Enhanced System Prompt:**
+```markdown
+You are a technical assistant specializing in information extraction.
+
+## Core Capabilities
+- Extract person_name, age, occupation and location from a given text.
+- Return the information in JSON format.
+- If a given text does not contain the required information, leave value empty.
+
+## Response Format
+Return only valid JSON.
+
+## Examples
+
+Example 1:
+Text: "John Smith, a 28-year-old teacher from London, lives in the United Kingdom."
+Output:
+{
+  "person_name": "John Smith",
+  "age": 28,
+  "occupation": "teacher",
+  "location": "London, United Kingdom"
+}
+
+Example 2:
+Text: "My doctor is Maria Rodriguez. She works from Barcelona, Spain."
+Output:
+{
+  "person_name": "Maria Rodriguez",
+  "age": "",
+  "occupation": "doctor",
+  "location": "Barcelona, Spain"
+}
+```
+
+**Input:**
+```
+Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
+```
+
+**Output:**
+```text
+"{\n  \"person_name\": \"Sarah Chen\",\n  \"age\": 34,\n  \"occupation\": \"software engineer\",\n  \"location\": \"Toronto, Canada\"\n}"
+```
+
+**Result**: ✅ Clean JSON output without markdown formatting. The examples taught the model the exact output format expected.
+
+**Key Takeaway**: Few-shot examples are essential for structured output tasks. They demonstrate the exact format, handling of missing data (age: -1), and prevent unwanted formatting like markdown code blocks.
 
 ---
 
@@ -238,6 +327,35 @@ Adjust your prompts by:
 - Emphasizing frequently missed constraints
 - Simplifying overly complex instructions
 - Adding positive guidance for common mistakes
+
+#### Task Decomposition Based on Testing
+
+During testing, if you find the model cannot handle various instructions in different forms or struggles with complex multi-step tasks, consider **task decomposition**:
+
+- **Break complex tasks into smaller subtasks**: Instead of one large instruction, create a sequence of simpler, focused instructions
+- **Use explicit step-by-step workflows**: Guide the model through each phase of a complex operation
+- **Separate concerns**: Divide tasks by function (e.g., data gathering, analysis, output generation)
+- **Test individual components**: Validate each subtask independently before combining them
+
+**Example of Task Decomposition:**
+
+Instead of:
+```markdown
+Analyze the codebase, identify security vulnerabilities, suggest fixes, and generate a report.
+```
+
+Decompose into:
+```markdown
+1. Use `search_files` to scan for common security patterns
+2. Use `read_file` to examine flagged files in detail
+3. Document findings with specific line references
+4. Generate recommendations for each vulnerability
+5. Use `write_file` to create the final report
+```
+
+This approach helps smaller models maintain focus and accuracy throughout complex workflows.
+
+For comprehensive guidance on testing methodologies and iterative improvement strategies, see [`testing_agents.md`](testing_agents.md).
 
 ## Conclusion
 
