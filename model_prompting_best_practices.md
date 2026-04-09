@@ -158,7 +158,7 @@ Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 "{\n  \"person_name\": \"Sarah Chen\",\n  \"age\": 34,\n  \"occupation\": \"software engineer\",\n  \"location\": \"Toronto, Canada\"\n}"
 ```
 
-**Result**: ✅ Clean JSON output without markdown formatting. The examples taught the model the exact output format expected.
+**Result**: Clean JSON output without markdown formatting. The examples taught the model the exact output format expected.
 
 **Key Takeaway**: Few-shot examples are essential for structured output tasks. They demonstrate the exact format, handling of missing data (age: -1), and prevent unwanted formatting like markdown code blocks.
 
