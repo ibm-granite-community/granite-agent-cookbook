@@ -2,7 +2,7 @@
 
 ## Introduction
 
-When working with Small Language Models (SLMs)—models in agent systems and applications, effective prompting becomes critical. Unlike their larger counterparts, SLMs have limited capacity and require more precise, well-structured prompts to deliver accurate and reliable responses. This guide explores best practices for crafting system prompts and tool definitions that maximize the performance of smaller LLMs within agent frameworks.
+When working with Small Language Models (SLMs) in agent systems and applications, effective prompting becomes critical. Unlike their larger counterparts, SLMs have limited capacity and require more precise, well-structured prompts to deliver accurate and reliable responses. This guide explores best practices for crafting system prompts and tool definitions that maximize the performance of smaller LLMs within agent frameworks.
 
 ## What Are Small Language Models (SLMs)?
 
@@ -342,7 +342,9 @@ The current standard for tool definitions is structured as follows:
 
 Use **action-oriented verbs** with consistent casing for function names. Choose the convention that matches your ecosystem (snake_case for Python, camelCase for JavaScript, PascalCase for C#):
 
-**Good Examples**
+<table>
+<tr><th>Good Examples </th><th>Poor Examples</th></tr>
+<tr><td>
 
 | Examples | Notes |
 | -------- | ----- |
@@ -351,7 +353,7 @@ Use **action-oriented verbs** with consistent casing for function names. Choose 
 | `search_database` | Action-oriented naming |
 | `generate_report` | Concise and clear |
 
-**Poor Examples**
+</td><td>
 
 | Examples | Notes |
 | -------- | ----- |
@@ -359,6 +361,8 @@ Use **action-oriented verbs** with consistent casing for function names. Choose 
 | `ReadFile` | Not snake_case |
 | `file` | Not action-oriented |
 | `do_file_stuff` | Vague, not specific |
+
+</td></tr> </table>
 
 **Guidelines:**
 
@@ -435,7 +439,7 @@ Parameters follow JSON Schema specifications. Each parameter should specify:
 
 ## Multi-Turn Conversations with SLMs
 
-SLMs can experience context drift in long conversations. Design for this limitation:
+SLMs can experience context drift in long conversations. Design for this limitation by applying the following strategies:
 
 ### State Management
 
@@ -451,8 +455,8 @@ SLMs can experience context drift in long conversations. Design for this limitat
 
 **Example:**
 
-- Weak: "What's the status?" (requires remembering previous context)
-- Better: "What's the status of job JOB12345 on system S2?" (self-contained)
+- Weak: "What's the status?" *(requires remembering previous context)*
+- Better: "What's the status of job JOB12345 on system S2?" *(self-contained)*
 
 ## Integration Strategies
 
@@ -460,7 +464,7 @@ SLMs can experience context drift in long conversations. Design for this limitat
 
 When tools are defined using JSON schemas and passed to the model, explicitly referencing those same tools within the system prompt helps the model understand when and how to use them. By naming the tools directly in the instructions and describing their purpose in context, the prompt provides additional guidance that complements the tool definitions.
 
-Structure agent instructions to reference tools explicitly:
+Structure agent instructions to reference tools naturally:
 
 ```markdown
 You are a code analysis assistant with access to file reading and search tools.
