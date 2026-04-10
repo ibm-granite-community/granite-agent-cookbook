@@ -18,7 +18,7 @@ Smaller models have limited context windows and processing capacity. Every token
 
 ### Prioritize Task Oriented Guidelines
 
-Frame instructions using positive action words rather than negative prohibitions. 
+Frame instructions using positive action words rather than negative prohibitions.
 This approach is more effective because:
 
 - Positive framing tells the model **what to do** rather than what to avoid
@@ -30,13 +30,12 @@ Just like telling someone "Don't look behind you" is the surest way to have them
 **Example of Negative vs. Positive Framing:**
 
 | Avoid (Negative Framing) | Prefer (Positive Framing) |
-|------------------------------|------------------------------|
+| ---------------------------- | ---------------------------- |
 | "Do not provide verbose explanations. Do not include unnecessary details." | "Provide concise explanations. Focus on essential details." |
 | "Don't forget to validate input parameters." | "Validate all input parameters before processing." |
 | "Never use deprecated functions in your code." | "Use current, supported functions in your code." |
 | "Don't make assumptions about user requirements." | "Clarify user requirements before proceeding." |
 | "Avoid writing code without proper error handling." | "Include comprehensive error handling in all code." |
-
 
 ### Break Down Complex Instructions
 
@@ -58,6 +57,7 @@ Provide responses in three parts:
 ```
 
 This modular approach helps smaller models:
+
 - Process instructions more effectively
 - Maintain focus on specific aspects
 - Reduce confusion from information overload
@@ -85,6 +85,7 @@ This example demonstrates how few-shot examples significantly improve structured
 ##### Approach 1: Zero-Shot (No Examples)
 
 **System Prompt:**
+
 ```markdown
 You are a technical assistant specializing in information extraction.
 
@@ -98,12 +99,14 @@ Return only valid JSON.
 ```
 
 **Input:**
-```
+
+```text
 Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 ```
 
 **Output:**
-```text
+
+```json
 "```json\n{\n  \"person_name\": \"Sarah Chen\",\n  \"age\": 34,\n  \"occupation\": \"software engineer\",\n  \"location\": \"Toronto, Canada\"\n}\n```"
 ```
 
@@ -114,6 +117,7 @@ Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 ##### Approach 2: Few-Shot (With Examples)
 
 **Enhanced System Prompt:**
+
 ```markdown
 You are a technical assistant specializing in information extraction.
 
@@ -149,12 +153,14 @@ Output:
 ```
 
 **Input:**
-```
+
+```text
 Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 ```
 
 **Output:**
-```text
+
+```json
 "{\n  \"person_name\": \"Sarah Chen\",\n  \"age\": 34,\n  \"occupation\": \"software engineer\",\n  \"location\": \"Toronto, Canada\"\n}"
 ```
 
@@ -198,22 +204,25 @@ The current standard for tool definitions is structured as follows:
 Use **action-oriented verbs in snake_case** for function names:
 
 **Good Examples**
+
 | Examples | Notes |
-|----------|-------|
+| -------- | ----- |
 | `read_file` | Clear action verb, snake_case format |
 | `execute_command` | Specific and descriptive |
 | `search_database` | Action-oriented naming |
 | `generate_report` | Concise and clear |
 
 **Poor Examples**
+
 | Examples | Notes |
-|----------|-------|
+| -------- | ----- |
 | `file_reader_tool` | Redundant "tool" suffix |
 | `ReadFile` | Not snake_case |
 | `file` | Not action-oriented |
 | `do_file_stuff` | Vague, not specific |
 
 **Guidelines:**
+
 - Start with a verb that clearly indicates the action
 - Use specific, descriptive names
 - Keep names concise (2-3 words maximum)
@@ -242,6 +251,7 @@ The `description` field is critical for model understanding. Structure it to inc
 ```
 
 **Description Guidelines:**
+
 - Keep the first sentence direct and action-focused
 - Use bold (**text**) for critical constraints that prevent errors
 - Include when-to-use guidance to help the model choose appropriate tools
@@ -323,6 +333,7 @@ Monitor your model's performance and refine prompts based on:
 4. **Efficiency**: Is the model using tools optimally?
 
 Adjust your prompts by:
+
 - Adding clarifying examples for problematic areas
 - Emphasizing frequently missed constraints
 - Simplifying overly complex instructions
@@ -340,11 +351,13 @@ During testing, if you find the model cannot handle various instructions in diff
 **Example of Task Decomposition:**
 
 Instead of:
+
 ```markdown
 Analyze the codebase, identify security vulnerabilities, suggest fixes, and generate a report.
 ```
 
 Decompose into:
+
 ```markdown
 1. Use `search_files` to scan for common security patterns
 2. Use `read_file` to examine flagged files in detail
@@ -362,6 +375,7 @@ For comprehensive guidance on testing methodologies and iterative improvement st
 Effective prompting of small large language models requires precision, clarity, and thoughtful design. By following these principles—concise system prompts with positive framing, well-structured tool definitions with clear constraints, and comprehensive examples—you can build reliable agent systems that leverage smaller models effectively.
 
 Remember:
+
 - **Conciseness is key**: Every token matters with smaller models
 - **Positive framing works better**: Tell the model what to do, not what to avoid
 - **Structure reduces complexity**: Break down complex instructions into manageable parts

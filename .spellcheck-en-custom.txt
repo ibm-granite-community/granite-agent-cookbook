@@ -7,11 +7,13 @@ CDLA
 DCO
 dev
 embeddings
+Enum
 explainability
 FC
 GPG
 interdependencies
 ipynb
+JSON
 Langfuse
 lifecycle
 LLM
@@ -23,9 +25,12 @@ productizing
 repo
 sandboxed
 signoff
+SLMs
 Subagent
 subagents
 Substring
+subtask
+subtasks
 toolset
 TTFT
 UI
