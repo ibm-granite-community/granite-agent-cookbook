@@ -346,7 +346,7 @@ Use **action-oriented verbs** with consistent casing for function names. Choose 
 <tr><th>Good Examples </th><th>Poor Examples</th></tr>
 <tr><td>
 
-| Examples | Notes |
+| Name | Note |
 | -------- | ----- |
 | `read_file` | Clear action verb, snake_case format |
 | `execute_command` | Specific and descriptive |
@@ -355,7 +355,7 @@ Use **action-oriented verbs** with consistent casing for function names. Choose 
 
 </td><td>
 
-| Examples | Notes |
+| Name | Note |
 | -------- | ----- |
 | `file_reader_tool` | Redundant "tool" suffix |
 | `ReadFile` | Not snake_case |
