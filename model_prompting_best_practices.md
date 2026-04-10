@@ -11,6 +11,7 @@ For this guide, SLMs refer to models with:
 - **Parameter counts**: Typically 1B-13B parameters
 - **Context windows**: Usually 2K-8K tokens (vs. 32K-128K+ for larger models)
 - **Use cases**: Edge deployment, cost-sensitive applications, specialized domains
+- **Resources**: Can usually fit on 1 single compute node. For example, on one retail level GPU.
 
 ## System Prompt Design Principles
 
