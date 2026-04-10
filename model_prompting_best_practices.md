@@ -76,7 +76,7 @@ You are a technical assistant specializing in information extraction.
 ## Core Capabilities
 - Extract person_name, age, occupation and location from a given text.
 - Return the information in JSON format.
-- If a given text does not contain the required information, leave value empty.
+- If a given text does not contain the required information, leave the value empty.
 
 ## Response Format
 Return only valid JSON.
@@ -98,7 +98,7 @@ Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 
 ---
 
-##### Approach 2: Few-Shot (With Examples)
+##### Approach 2: Few-Shot (With Examples in System Prompt)
 
 **Enhanced System Prompt:**
 
@@ -149,7 +149,75 @@ Sarah Chen is a 34-year-old software engineer living in Toronto, Canada.
 
 **Result**: Clean JSON output without markdown formatting. The examples taught the model the exact output format expected.
 
-**Key Takeaway**: Few-shot examples are essential for structured output tasks. They demonstrate the exact format, handling of missing data, and prevent unwanted formatting like markdown code blocks.
+---
+
+##### Approach 3: Few-Shot (With Message History)
+
+For chat completion endpoints, you can alternatively provide examples as actual conversation history:
+
+**System Prompt:**
+
+```markdown
+You are a technical assistant specializing in information extraction.
+
+## Core Capabilities
+- Extract person_name, age, occupation and location from a given text.
+- Return the information in JSON format.
+- If a given text does not contain the required information, leave the value empty.
+
+## Response Format
+Return only valid JSON.
+```
+
+**Message History:**
+
+```json
+[
+  {
+    "role": "system",
+    "content": "[System prompt above]"
+  },
+  {
+    "role": "user",
+    "content": "Extract information from: 'John Smith, a 28-year-old teacher from London, lives in the United Kingdom.'"
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"person_name\": \"John Smith\",\n  \"age\": 28,\n  \"occupation\": \"teacher\",\n  \"location\": \"London, United Kingdom\"\n}"
+  },
+  {
+    "role": "user",
+    "content": "Extract information from: 'My doctor is Maria Rodriguez. She works from Barcelona, Spain.'"
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"person_name\": \"Maria Rodriguez\",\n  \"age\": \"\",\n  \"occupation\": \"doctor\",\n  \"location\": \"Barcelona, Spain\"\n}"
+  }
+]
+```
+
+**Result**: Same clean JSON output. This approach uses actual message history instead of embedding examples in the system prompt.
+
+---
+
+##### Choosing Between Approaches
+
+**Both few-shot approaches work effectively.** Choose based on your context:
+
+**System Prompt Examples (Approach 2) are better when:**
+
+- Using base models or instruction-tuned (non-chat) models
+- Examples are simple input→output patterns
+- You want to preserve conversation history for actual user context
+- Token efficiency is critical (system prompts are often cached by providers)
+
+**Message History Examples (Approach 3) are better when:**
+
+- Using chat-tuned models specifically trained on conversational formats
+- Examples involve multi-turn interactions or dialogue
+- You need the model to maintain conversational flow and context
+
+**Key Takeaway**: Few-shot examples are essential for structured output tasks. They demonstrate the exact format, handling of missing data, and prevent unwanted formatting and behaviors. Choose the approach that best fits your use case.
 
 ---
 
@@ -239,6 +307,8 @@ This budgeting approach helps smaller models:
 - Retain the highest-priority instructions
 - Avoid losing critical behavior or format constraints
 
+Note to reader : Link to context management blog post coming soon.
+
 ## Tool Definitions: Best Practices
 
 Tool definitions are crucial for enabling LLMs to interact with external systems effectively. Well-designed tool definitions guide the model to use tools correctly and efficiently.
@@ -319,13 +389,6 @@ The `description` field is critical for model understanding. Structure it to inc
 }
 ```
 
-**Description Guidelines:**
-
-- Keep the first sentence direct and action-focused
-- Use bold (**text**) for critical constraints that prevent errors
-- Include when-to-use guidance to help the model choose appropriate tools
-- Aim for 2-4 sentences maximum for clarity
-
 ### Parameter Schema Documentation
 
 Parameters follow JSON Schema specifications. Each parameter should specify:
@@ -334,7 +397,7 @@ Parameters follow JSON Schema specifications. Each parameter should specify:
 2. **Description**: Clear explanation of purpose, format, and constraints
 3. **Enum**: List allowed values when applicable
 4. **Required Status**: Include in `required` array if mandatory
-5. **Additional Constraints**: Use `pattern`, `minimum`, `maximum`, `items`, etc.
+5. **Additional Constraints**: Use `pattern`, `default`, `minimum`, `maximum`, `items`, etc.
 
 **Complete Example:**
 
@@ -372,12 +435,12 @@ Parameters follow JSON Schema specifications. Each parameter should specify:
 
 ## Multi-Turn Conversations with SLMs
 
-SLMs lose context quickly in long conversations. Design for this limitation:
+SLMs can experience context drift in long conversations. Design for this limitation:
 
 ### State Management
 
 - Store critical information (IDs, names, parameters) in structured state
-- Don't rely on the model to "remember" from 5+ turns ago
+- Critical information should be reiterated when context drift is observed
 - Explicitly pass previous results to status check tools
 
 ### Context Compression
@@ -393,9 +456,11 @@ SLMs lose context quickly in long conversations. Design for this limitation:
 
 ## Integration Strategies
 
-### Combining System Prompts with Tool Definitions
+### Tool reference integration
 
-Structure your agent's instructions to reference tools naturally:
+When tools are defined using JSON schemas and passed to the model, explicitly referencing those same tools within the system prompt helps the model understand when and how to use them. By naming the tools directly in the instructions and describing their purpose in context, the prompt provides additional guidance that complements the tool definitions.
+
+Structure agent instructions to reference tools explicitly:
 
 ```markdown
 You are a code analysis assistant with access to file reading and search tools.
@@ -442,9 +507,9 @@ Use a systematic approach to improve prompts based on measurable outcomes:
 **4. Common Refinement Patterns**
 
 - **Tool selection wrong** → Clarify tool descriptions
-- **Arguments wrong** → Add parameter examples
-- **Format wrong** → Add explicit format template
-- **Context lost** → Add state management
+- **Arguments wrong** → Clarify argument description, add argument examples
+- **Format wrong** → Add in few-shot examples, showcasing the desired response format template
+- **Context lost** → Add state management or reiterate instructions
 - **General confusion** → Add clarifying examples for problematic areas
 
 **Anti-Pattern:** Changing multiple things at once without knowing what worked
@@ -454,7 +519,7 @@ Use a systematic approach to improve prompts based on measurable outcomes:
 During testing, if you find the model cannot handle various instructions in different forms or struggles with complex multi-step tasks, consider **task decomposition**:
 
 - **Break complex tasks into smaller subtasks**: Instead of one large instruction, create a sequence of simpler, focused instructions
-- **Use explicit step-by-step workflows**: Guide the model through each phase of a complex operation
+- **Use explicit step-by-step workflows**: For frequently reused and well defined workflows, document those explicitly in the system prompt or through few-shot examples, to guide the model through each phase of a complex operation
 - **Separate concerns**: Divide tasks by function (e.g., data gathering, analysis, output generation)
 - **Test individual components**: Validate each subtask independently before combining them
 
