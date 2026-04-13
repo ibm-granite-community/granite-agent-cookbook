@@ -35,6 +35,8 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    </a>
 1. [Observability and Testing for Agents using LangFuse](recipes/Tracing/Tracing_Agent.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Tracing/Tracing_Agent.ipynb">
+1. [AI_Agent_Security](recipes/AI_Agent_Security/AI_Agent_Security.ipynb)
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/AI_Agent_Security/AI_Agent_Security.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 
