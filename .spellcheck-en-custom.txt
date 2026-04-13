@@ -17,6 +17,7 @@ JSON
 Langfuse
 lifecycle
 LLM
+md
 NL
 observability
 performant
@@ -24,6 +25,7 @@ pre
 productizing
 repo
 sandboxed
+schemas
 signoff
 SLMs
 Subagent
