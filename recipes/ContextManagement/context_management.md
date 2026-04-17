@@ -12,15 +12,15 @@ The context window is an agent's entire working memory. Unlike a human, an agent
 
 **Model Context**
 
-The live token stream the LLM sees at each call: system prompt, conversation turns, tool definitions, and tool results. This is the only thing that actually influences the model's next output. It is ephemeral by default, reset on every new call unless you explicitly carry it forward.
+The live token stream the LLM sees at each call: system prompt, conversation turns, tool definitions, and tool results. This is the only thing that actually influences the model's next output. It is ephemeral by default, reset on every new call unless you explicitly carry it forward. Within a single thread, a thread-scoped memory layer persists the conversation state across LLM calls, automatically replaying it into the next call's context window.
 
 **Tool / Store Context**
 
-State that lives outside the model but can be injected on demand: a LangGraph state object, an in-memory key-value store, a Postgres-backed long-term memory, a vector database. Think of this as the agent's filing cabinet.
+State that lives outside the model but can be injected on demand: a [LangGraph state object](https://langchain-ai.github.io/langgraph/concepts/low_level/#state), an in-memory key-value store, a Postgres-backed long-term memory, a vector database. Think of this as the agent's filing cabinet.
 
 **Life-cycle Context**
 
-Everything that persists across agent runs: user preferences, prior task summaries, learned facts. In LangGraph this maps to a persistent store that survives thread boundaries.
+Everything that persists across agent runs: user preferences, prior task summaries, learned facts. In LangGraph this maps to a [persistent store](https://langchain-ai.github.io/langgraph/concepts/persistence/) that survives thread boundaries.
 
 ---
 
@@ -261,3 +261,4 @@ Context management is the hardest part of building reliable agents. A few themes
 | [How Contexts Fail and How to Fix Them](https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html)                                 |
 | [An Agentic Case Study: Playing Pokémon with Gemini](https://www.dbreunig.com/2025/06/17/an-agentic-case-study-playing-pok%C3%A9mon-with-gemini.html)   |
 | [Context Rot: How Increasing Input Tokens Impacts LLM Performance](https://www.trychroma.com/research/context-rot#needle-in-a-haystack-extension)       |
+| [LangGraph Concepts: State & Persistence](https://langchain-ai.github.io/langgraph/concepts/) |
