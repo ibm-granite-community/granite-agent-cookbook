@@ -98,7 +98,7 @@ Instead of silently dropping old messages, compaction uses an LLM to generate a 
 
 **Failure mode addressed:** Context Confusion
 
-Every tool definition you bind to the LLM consumes tokens and introduces potential confusion. Research from the [RAG-MCP paper](https://arxiv.org/abs/2505.03275) found that above 30 tools with overlapping descriptions, tool selection accuracy degrades sharply; above 100 tools, failure is near-certain. The "Less is More" paper showed Llama 3.1 8B fails a benchmark with 46 tools but succeeds with 19.
+Every tool definition you bind to the LLM consumes tokens and introduces potential confusion. Research from the [RAG-MCP paper](https://arxiv.org/abs/2505.03275) found that above 30 tools with overlapping descriptions, tool selection accuracy degrades sharply; above 100 tools, failure is near-certain. The ["Less is More" paper](https://arxiv.org/abs/2411.15399) showed Llama 3.1 8B fails a benchmark with 46 tools but succeeds with 19.
 
 The solution: embed all tool descriptions in a vector store and retrieve only the semantically relevant tools at each LLM call. The [RAG-MCP](https://arxiv.org/abs/2505.03275) team found this yielded up to 3x improvement in tool selection accuracy.
 
@@ -253,3 +253,4 @@ Context management is the hardest part of building reliable agents. A few themes
 | [Context Rot: How Increasing Input Tokens Impacts LLM Performance](https://www.trychroma.com/research/context-rot#needle-in-a-haystack-extension)       |
 | [LangGraph Concepts: State & Persistence](https://langchain-ai.github.io/langgraph/concepts/) |
 | [RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation](https://arxiv.org/abs/2505.03275) |
+| [Less is More: Summarizing Long Instructions for Enhanced LLM Tool Use](https://arxiv.org/abs/2411.15399) |
