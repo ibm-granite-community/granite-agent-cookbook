@@ -214,6 +214,8 @@ A multi-agent setup with a lead agent and subagents often outperforms single-age
 
 ### Strategy Stack by Scenario
 
+Context management is use-case specific. The stacks below are starting points.Your constraints may point to a different combination.
+
 | Scenario | Recommended Stack |
 | --- | --- |
 | Short conversational agent (< 20 turns) | Strategy 1 Rolling Window |
