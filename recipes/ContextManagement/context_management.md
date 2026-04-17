@@ -73,9 +73,9 @@ This directly combats Context Distraction. By capping history length you prevent
 
 | Advantages | Limitations |
 | --- | --- |
-| Trivial to implement |  Permanently discards early context |
-| Zero infrastructure required |  Invisible to the agent, it cannot know what was lost |
-| Predictable token budget |  Poor fit for tasks requiring long-range coherence |
+| Trivial to implement | Permanently discards early context |
+| Zero infrastructure required | Invisible to the agent, it cannot know what was lost |
+| Predictable token budget | Poor fit for tasks requiring long-range coherence |
 
 ---
 
@@ -87,11 +87,11 @@ Instead of silently dropping old messages, compaction uses an LLM to generate a 
 
 > **Note:** Summarization must be done carefully to avoid losing critical information. Treat the compaction model as a first-class component that needs its own evaluation and prompt engineering.
 
-| Advantages | Limitations                                                                 |
-| --- |-----------------------------------------------------------------------------|
+| Advantages | Limitations |
+| --- | --- |
 | Preserves compressed form of all history | Risk of information loss. Carefully prompt or fine-tune the compaction model |
-| Agent sees a coherent narrative, not an abrupt cutoff | Adds latency and cost at compaction time                                    |
-| Works well for long-running conversational agents | Use context offloading (Strategy 6) to avoid information loss entirely      |
+| Agent sees a coherent narrative, not an abrupt cutoff | Adds latency and cost at compaction time |
+| Works well for long-running conversational agents | Use context offloading (Strategy 6) to avoid information loss entirely |
 
 ---
 
@@ -105,9 +105,9 @@ The solution: embed all tool descriptions in a vector store and retrieve only th
 
 | Advantages | Limitations |
 | --- | --- |
-| Directly prevents Context Confusion from overlapping tool definitions |  Requires maintaining embedded tool index |
-| Reduces prompt length and cost per call |  Retrieval can miss tools for novel query types |
-| Scales to large tool registries (100+ tools) |  Adds one embedding lookup per LLM call |
+| Directly prevents Context Confusion from overlapping tool definitions | Requires maintaining embedded tool index |
+| Reduces prompt length and cost per call | Retrieval can miss tools for novel query types |
+| Scales to large tool registries (100+ tools) | Adds one embedding lookup per LLM call |
 
 ---
 
@@ -119,8 +119,8 @@ Pruning removes only the parts of a retrieved document or tool output that are i
 
 | Advantages | Limitations |
 | --- | --- |
-| Directly prevents Context Confusion and Poisoning |  Adds LLM call per tool output (or dedicated model overhead) |
-| Preserves exact wording, no risk of paraphrase errors |  May over-prune if the request is ambiguous |
+| Directly prevents Context Confusion and Poisoning | Adds LLM call per tool output (or dedicated model overhead) |
+| Preserves exact wording, no risk of paraphrase errors | May over-prune if the request is ambiguous |
 
 ---
 
@@ -136,9 +136,9 @@ This mirrors how humans work: we take notes during research, then synthesize tho
 
 | Advantages | Limitations |
 | --- | --- |
-| Agent remains aware of its own notes without bloating the message list |  Requires the agent to use the write tool, prompt engineering is essential |
-| Rewriting the plan (Manus pattern) keeps the agent on track for long tasks |  Scratchpad is within-session only (see Strategy 6 for cross-session persistence) |
-| Avoids information loss unlike summarization, the agent chooses what to keep |  Poor agent instruction can result in under-used scratchpad |
+| Agent remains aware of its own notes without bloating the message list | Requires the agent to use the write tool, prompt engineering is essential |
+| Rewriting the plan (Manus pattern) keeps the agent on track for long tasks | Scratchpad is within-session only (see Strategy 6 for cross-session persistence) |
+| Avoids information loss unlike summarization, the agent chooses what to keep | Poor agent instruction can result in under-used scratchpad |
 
 ---
 
@@ -152,9 +152,9 @@ When tasks are long enough to exceed even a well-managed context window, the fil
 
 | Advantages | Limitations |
 | --- | --- |
-| No information loss : full content is always recoverable |  Requires filesystem access or object storage |
-| Works for tasks that span multiple agent runs |  Agent must be prompted to use file tools consistently |
-| Selective reading (grep) keeps context focused on what's needed now |  File management adds coordination overhead for multi-agent systems |
+| No information loss : full content is always recoverable | Requires filesystem access or object storage |
+| Works for tasks that span multiple agent runs | Agent must be prompted to use file tools consistently |
+| Selective reading (grep) keeps context focused on what's needed now | File management adds coordination overhead for multi-agent systems |
 
 ---
 
@@ -168,9 +168,9 @@ Cognition (Devin) uses a fine-tuned model for this step, trained specifically to
 
 | Advantages | Limitations |
 | --- | --- |
-| Preserves semantically important information even under aggressive compression |  No standard LangChain abstraction : must build from scratch |
-| Can be tuned per domain (coding, research, customer service) |  Requires careful prompt engineering or fine-tuning per domain |
-| Produces a structured, inspectable summary |  Hardest to evaluate, information loss may be subtle |
+| Preserves semantically important information even under aggressive compression | No standard LangChain abstraction : must build from scratch |
+| Can be tuned per domain (coding, research, customer service) | Requires careful prompt engineering or fine-tuning per domain |
+| Produces a structured, inspectable summary | Hardest to evaluate, information loss may be subtle |
 
 ---
 
@@ -186,9 +186,9 @@ RAG directly addresses Context Confusion: only semantically relevant chunks ente
 
 | Advantages | Limitations |
 | --- | --- |
-| Only relevant information enters the context |  Retrieval quality depends on embedding model and chunking strategy |
-| Scales to arbitrarily large knowledge bases |  Can miss relevant information if the query phrasing doesn't match chunk content |
-| Mature ecosystem : many vector store backends available |  Adds infrastructure complexity (vector store, embedding pipeline) |
+| Only relevant information enters the context | Retrieval quality depends on embedding model and chunking strategy |
+| Scales to arbitrarily large knowledge bases | Can miss relevant information if the query phrasing doesn't match chunk content |
+| Mature ecosystem : many vector store backends available | Adds infrastructure complexity (vector store, embedding pipeline) |
 
 ---
 
@@ -204,10 +204,10 @@ A multi-agent setup with a lead agent and subagents often outperforms single-age
 
 | Advantages | Limitations |
 | --- | --- |
-| Prevents Context Clash between independent research threads |  High orchestration complexity |
-| Massive effective context window (N subagents × model context) |  Tightly coupled tasks will produce contradictions |
-| Each subagent can have its own specialized tool loadout and prompt |  Coordination overhead adds latency |
-| Anthropic: 90.2% improvement over single-agent on research benchmarks |  Debugging multi-agent traces is significantly harder |
+| Prevents Context Clash between independent research threads | High orchestration complexity |
+| Massive effective context window (N subagents × model context) | Tightly coupled tasks will produce contradictions |
+| Each subagent can have its own specialized tool loadout and prompt | Coordination overhead adds latency |
+| Anthropic: 90.2% improvement over single-agent on research benchmarks | Debugging multi-agent traces is significantly harder |
 
 ---
 
@@ -251,7 +251,7 @@ Context management is the hardest part of building reliable agents. A few themes
 | [How Contexts Fail and How to Fix Them](https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html)                                 |
 | [An Agentic Case Study: Playing Pokémon with Gemini](https://www.dbreunig.com/2025/06/17/an-agentic-case-study-playing-pok%C3%A9mon-with-gemini.html)   |
 | [Context Rot: How Increasing Input Tokens Impacts LLM Performance](https://www.trychroma.com/research/context-rot#needle-in-a-haystack-extension)       |
-| [LangGraph Concepts: State & Persistence](https://langchain-ai.github.io/langgraph/concepts/) |
-| [RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation](https://arxiv.org/abs/2505.03275) |
-| [Less is More: Summarizing Long Instructions for Enhanced LLM Tool Use](https://arxiv.org/abs/2411.15399) |
-| [Manus: Context Engineering for AI Agents — Lessons from Building Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) |
+| [LangGraph Concepts: State & Persistence](https://langchain-ai.github.io/langgraph/concepts/)                                                           |
+| [RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation](https://arxiv.org/abs/2505.03275)                           |
+| [Less is More: Summarizing Long Instructions for Enhanced LLM Tool Use](https://arxiv.org/abs/2411.15399)                                               |
+| [Manus: Context Engineering for AI Agents](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus)                         |
