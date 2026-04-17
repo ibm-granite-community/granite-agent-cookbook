@@ -131,9 +131,7 @@ Instead of letting tool outputs pile up in the message list, the agent actively 
 
 This mirrors how humans work: we take notes during research, then synthesize those notes into a final output.
 
-> **Manus: `todo.md` as Recitation**
->
-> Manus tasks involve 50+ tool calls and are extremely token-heavy. Their key innovation: the agent creates a `todo.md` plan at the start and continuously rewrites it throughout task execution. This is not just note-taking, it is *recitation*. By rewriting the plan at each step, the agent is forced to re-contextualize where it is in the task, which keeps it on track even as the raw context fills up.
+> **Note:** For token-heavy tasks involving 50+ tool calls, continuously rewriting a `todo.md` plan throughout execution — rather than just creating it once — forces the agent to re-contextualize its position in the task at each step. This *recitation* pattern keeps long-running agents on track even as the raw context fills up. See [Manus: Context Engineering for AI Agents](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) for a detailed treatment of this approach.
 
 | Advantages | Limitations |
 | --- | --- |
@@ -149,14 +147,13 @@ This mirrors how humans work: we take notes during research, then synthesize tho
 
 When tasks are long enough to exceed even a well-managed context window, the filesystem becomes the memory system. The agent writes plans, intermediate results, and findings to files; reads them back selectively; and uses `grep` or search to locate specific information without loading entire files.
 
-This is the approach taken by the Anthropic multi-agent research system for tasks that could exceed 200,000 tokens. Manus uses this as their preferred alternative to summarization avoiding the information loss risk entirely.
+> **Note:** Granting an agent read/write filesystem access is a significant trust boundary. Scope permissions to a dedicated working directory, never the full filesystem. For multi-agent systems, enforce per-agent path isolation to prevent one agent from overwriting another's files. Treat any file path supplied by tool output as untrusted input.
 
 | Advantages | Limitations |
 | --- | --- |
 | No information loss : full content is always recoverable |  Requires filesystem access or object storage |
 | Works for tasks that span multiple agent runs |  Agent must be prompted to use file tools consistently |
 | Selective reading (grep) keeps context focused on what's needed now |  File management adds coordination overhead for multi-agent systems |
-| Preferred by Manus over summarization for tool-heavy agents | |
 
 ---
 
@@ -254,3 +251,4 @@ Context management is the hardest part of building reliable agents. A few themes
 | [LangGraph Concepts: State & Persistence](https://langchain-ai.github.io/langgraph/concepts/) |
 | [RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation](https://arxiv.org/abs/2505.03275) |
 | [Less is More: Summarizing Long Instructions for Enhanced LLM Tool Use](https://arxiv.org/abs/2411.15399) |
+| [Manus: Context Engineering for AI Agents — Lessons from Building Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) |
