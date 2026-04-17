@@ -199,7 +199,7 @@ Context Quarantine means isolating different parts of a task in separate LLM con
 
 A multi-agent setup with a lead agent and subagents often outperforms single-agent on research benchmarks largely because each subagent can pursue an independent research direction without accumulating irrelevant context from other directions. With 10 subagents each having a 200k-token window, the system can process 2 million tokens of total information.
 
-> ⚠️ **Coordination Warning:** Constrain subagents to *information gathering*, not decision making. Let a single agent do all the synthesis and writing at the end. If the subtasks must be tightly coordinated to produce a coherent whole, keep them in a single agent.
+> **Note:** Constrain subagents to *information gathering*, not decision making. Let a single agent do all the synthesis and writing at the end. If the subtasks must be tightly coordinated to produce a coherent whole, keep them in a single agent.
 
 | Advantages | Limitations |
 | --- | --- |
@@ -223,8 +223,6 @@ A multi-agent setup with a lead agent and subagents often outperforms single-age
 | Knowledge-intensive Q&A agent | Strategy 8 (RAG) + Strategy 4 (Pruning) |
 | Parallel research / breadth-first tasks | Strategy 9 (Sub-agents) information gathering only |
 | Long-running multi-session agent | Strategy 6 (Filesystem) + persistent Store |
-
-> When evaluating your agent's context management, do not rely solely on Needle-in-a-Haystack (NIAH) benchmarks. NIAH measures a narrow capability `lexical retrieval` but models that score near-perfectly on NIAH can still degrade badly on semantic reasoning tasks as context grows. Build evaluation sets that reflect your actual task distribution, include distractor content, and test at context lengths beyond your expected operating range.
 
 ---
 
