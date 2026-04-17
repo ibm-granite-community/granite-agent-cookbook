@@ -21,6 +21,7 @@ State that lives outside the model but can be injected on demand: a [LangGraph s
 **Life-cycle Context**
 
 Everything that persists across agent runs: user preferences, prior task summaries, learned facts. In LangGraph this maps to a [persistent store](https://langchain-ai.github.io/langgraph/concepts/persistence/) that survives thread boundaries.
+A common implementation of lifecycle context is a static instruction file `AGENTS.md` committed to the repository and injected into the system prompt at startup. Unlike runtime-accumulated context, it is human-authored and fixed: project conventions, tool rules, and constraints. Since it loads on every call regardless of relevance, it is a fixed token cost that grows silently as the file does.
 
 ---
 
