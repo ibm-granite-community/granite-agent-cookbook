@@ -179,6 +179,8 @@ Cognition (Devin) uses a fine-tuned model for this step, trained specifically to
 
 Retrieval-Augmented Generation is the act of selectively retrieving relevant information from an external corpus and injecting it into the context window at call time. Rather than pre-loading all knowledge, the agent fetches only what is relevant to the current query.
 
+> **Note:** Combined with Strategy 1 (FIFO), RAG can approximate a lightweight scratchpad pattern: the agent writes findings to an external store, the rolling window keeps the active context lean, and RAG retrieves only the relevant stored content at each step.The core benefit of Strategies 5 and 6 without requiring filesystem infrastructure.
+
 RAG directly addresses Context Confusion: only semantically relevant chunks enter the context, so the model is not distracted by irrelevant passages. Chroma's LongMemEval results showed that models given focused, relevant context (~300 tokens) vastly outperformed models given the full 113k-token history, even though the full history contained all the necessary information.
 
 | Advantages | Limitations |
