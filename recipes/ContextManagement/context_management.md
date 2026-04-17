@@ -26,11 +26,6 @@ Everything that persists across agent runs: user preferences, prior task summari
 
 ## 3. Why Context Management is Hard: The Four Failure Modes
 
-> Sources:
->
-> - <https://www.trychroma.com/research/context-rot#needle-in-a-haystack-extension>
-> - *Context Rot: How Increasing Input Tokens Impacts LLM Performance*
-
 ### Failure Mode 1: Context Poisoning
 
 A hallucination or incorrect inference enters the context and is treated as ground truth on subsequent turns. Because the model's outputs feed back into its own input, the error compounds. The longer the context, the more opportunities for poisoned information to be referenced and reinforced.
