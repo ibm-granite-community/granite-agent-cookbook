@@ -84,8 +84,6 @@ This directly combats Context Distraction. By capping history length you prevent
 
 Instead of silently dropping old messages, compaction uses an LLM to generate a summary of the conversation so far, then replaces the raw history with that summary. The summary becomes the new "base" for future turns. When the window approaches capacity, it compacts, replacing the full history with a structured summary.
 
-The key distinction from pruning (Strategy 4): summarization condenses all content into a shorter form. Pruning removes only the irrelevant content. Use summarization when all the history is broadly relevant but verbose. Use pruning when some parts are clearly irrelevant.
-
 > ⚠️ **Warning: Information Loss Risk**
 >
 > Cognition and Manus warn that summarization must be done carefully to avoid losing critical information. Cognition uses a fine-tuned model specifically for this step to ensure key events are preserved. Manus actively discourages summarization and prefers context offloading (Strategy 5) instead, because offloading avoids the information loss problem entirely.
@@ -120,13 +118,12 @@ The solution: embed all tool descriptions in a vector store and retrieve only th
 
 **Failure mode addressed:** Context Confusion, Context Poisoning
 
-Pruning removes only the parts of a retrieved document or tool output that are irrelevant to the current task. Where summarization condenses all content, pruning is surgical, it removes only the parts that are irrelevant, leaving the relevant parts intact. This maps directly to the Chroma finding that even a single distractor degrades accuracy; pruning prevents distractors from entering the context in the first place.
+Pruning removes only the parts of a retrieved document or tool output that are irrelevant to the current task. Where summarization condenses all content, pruning is surgical, it removes only the parts that are irrelevant, leaving the relevant parts intact. This maps directly to the Chroma finding that even a single distractor degrades accuracy; pruning prevents distractors from entering the context in the first place. Use summarization when all the history is broadly relevant but verbose. Use pruning when some parts are clearly irrelevant.
 
 | Advantages | Limitations |
 | --- | --- |
 | Directly prevents Context Confusion and Poisoning |  Adds LLM call per tool output (or dedicated model overhead) |
 | Preserves exact wording, no risk of paraphrase errors |  May over-prune if the request is ambiguous |
-| |  Pruning model needs evaluation for your specific domain |
 
 ---
 
