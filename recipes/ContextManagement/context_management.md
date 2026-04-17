@@ -46,6 +46,8 @@ Contradictory information accumulates in the context. Tightly coupled multi-agen
 
 ## 4. Strategy Overview
 
+The following strategies address the four failure modes identified above. Each targets one or more root causes: techniques like FIFO and Compaction tackle Distraction; Pruning and Dynamic Tool Selection address Confusion and Poisoning; Note-Taking, Filesystem, and Sub-agent architectures prevent Clash. The sections below describe each strategy in detail.
+
 | Strategy | Fixes |
 | --- | --- |
 | FIFO / Rolling Window | Distraction |
