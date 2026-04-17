@@ -36,7 +36,7 @@ When context grows so large that the model over-focuses on accumulated history a
 
 ### Failure Mode 3: Context Confusion
 
-Superfluous or irrelevant information in the context window actively degrades response quality. Chroma's research makes this concrete: even a single distractor : a passage topically related to the question but that doesn't answer it measurably reduces accuracy. Adding four distractors compounds this degradation further. The model feels compelled to use all available context, and irrelevant tokens pull it off target.
+Superfluous or irrelevant information in the context window actively degrades response quality. Even a single distractor, a passage topically related to the question but that doesn't answer it, can measurably reduce accuracy. Adding multiple distractors compounds this degradation further. The model can feel compelled to use all available context, and irrelevant tokens pull it off target.
 
 ### Failure Mode 4: Context Clash
 
