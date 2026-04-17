@@ -84,17 +84,13 @@ This directly combats Context Distraction. By capping history length you prevent
 
 Instead of silently dropping old messages, compaction uses an LLM to generate a summary of the conversation so far, then replaces the raw history with that summary. The summary becomes the new "base" for future turns. When the window approaches capacity, it compacts, replacing the full history with a structured summary.
 
-> ⚠️ **Warning: Information Loss Risk**
->
-> Cognition and Manus warn that summarization must be done carefully to avoid losing critical information. Cognition uses a fine-tuned model specifically for this step to ensure key events are preserved. Manus actively discourages summarization and prefers context offloading (Strategy 5) instead, because offloading avoids the information loss problem entirely.
->
-> If you use summarization, treat the compaction model as a first-class component that needs its own evaluation and prompt engineering.
+> **Note:** Summarization must be done carefully to avoid losing critical information. Treat the compaction model as a first-class component that needs its own evaluation and prompt engineering.
 
 | Advantages | Limitations |
 | --- | --- |
-| Preserves compressed form of all history |  Risk of information loss , fine-tune or carefully prompt the compaction model |
+| Preserves compressed form of all history |  Risk of information loss — carefully prompt or fine-tune the compaction model |
 | Agent sees a coherent narrative, not an abrupt cutoff |  Adds latency and cost at compaction time |
-| Works well for long-running conversational agents |  Manus recommends offloading over summarization for tool-heavy agents |
+| Works well for long-running conversational agents |  Context offloading (Strategy 6) avoids information loss entirely |
 
 ---
 
