@@ -39,6 +39,10 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/AI_Agent_Security/AI_Agent_Security.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
+1. [Techniques for working with SLMs](recipes/SLM_Techniques/building_with_slms.ipynb)
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/SLM_Techniques/building_with_slms.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
 
 ## Build Status
 
