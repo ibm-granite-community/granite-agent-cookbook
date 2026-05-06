@@ -260,6 +260,6 @@ Additional observability tools in the ecosystem include [LangSmith](https://www.
 
 ## 6. Conclusion
 
-CI/CD for agentic systems isn't a single tool or framework. It's a set of disciplines applied across your stack. We covered how to version the artifacts that define behavior (prompts, model parameters, tool definitions), enforce those versions at bootstrap so misconfigurations surface before traffic does, manage the prompt lifecycle with evaluation gates that catch regressions, package agents so what you test is what you ship, and build observability that reveals not only whether the service is up but whether it's doing its job well.
+CI/CD for agentic systems isn't a single tool or framework. It's a set of disciplines applied across your stack. We covered how to version the artifacts that define behavior (prompts, model parameters, tool definitions), enforce those versions at bootstrap so misconfigurations surface before traffic does, manage the prompt lifecycle with evaluation gates that catch regressions, package agents so what you test is what you ship, and build observability that reveals not only whether the service is up, but whether it's doing its job well.
 
 The field is evolving quickly. Tooling will change. The underlying principle won't: non-deterministic software still needs deterministic deployment. Start with the layers that give you the most leverage (prompt versioning and structured traces) and build from there. The goal isn't a perfect pipeline on day one. It's a pipeline that gets smarter every time something goes wrong.
