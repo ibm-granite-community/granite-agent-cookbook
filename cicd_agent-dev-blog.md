@@ -80,10 +80,10 @@ model_params:
   max_tokens: 1000
 ```
 
-| Approach                | Pros                                                                                                                                                | Cons                                                                                                                                  |
-|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| **Prompts as Code**     | • Strong typing and IDE support<br>• Automatic validation via linting/type-checking<br>• Changes go through standard PR review                    | • Requires code deployment for every prompt change<br>• Slower iteration cycles<br>• Less accessible to non-engineers                |
-| **Prompts as Config**   | • Fast iteration without code deployments<br>• Non-engineers can update prompts<br>• Supports A/B testing and rollbacks                           | • Harder to validate before deployment<br>• Risk of runtime errors from malformed config<br>• Requires separate versioning strategy  |
+| Approach              | Pros                                                                                                                  | Cons                                                                                                                    |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| **Prompts as Code**   | Strong typing and IDE support; automatic validation via linting/type-checking; changes go through standard PR review | Requires code deployment for every prompt change; slower iteration cycles; less accessible to non-engineers             |
+| **Prompts as Config** | Fast iteration without code deployments; non-engineers can update prompts; supports A/B testing and rollbacks         | Harder to validate before deployment; risk of runtime errors from malformed config; requires separate versioning strategy |
 
 **Recommendation:** Use a hybrid approach—prompts live in version-controlled config files, but loading and validation logic is code. The config drives the content; the code enforces the contract. This balances iteration speed with safety.
 
@@ -210,7 +210,7 @@ Packaging an agent for production means more than containerizing code. It means 
 
 For implementation details, see the [MCP specification](https://modelcontextprotocol.io/docs) and available SDKs.
 
-**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent handoffs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
+**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent hand offs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
 
 ### Standard Containerization Practices
 
