@@ -1,0 +1,270 @@
+{
+    "id": "729db7b424cd21fe34baa2c1e670e059",
+    "timestamp": "2026-02-20T03:54:26.618000Z",
+    "name": "LangGraph",
+    "input": {
+        "messages": [
+            "What is the weather in Miami?"
+        ]
+    },
+    "output": {
+        "messages": [
+            {
+                "content": "What is the weather in Miami?",
+                "additional_kwargs": {},
+                "response_metadata": {},
+                "type": "human",
+                "name": null,
+                "id": "3f817169-8fb1-4a0b-b19e-8fb35dc7d341"
+            },
+            {
+                "content": "",
+                "additional_kwargs": {},
+                "response_metadata": {
+                    "token_usage": {
+                        "completion_tokens": 28,
+                        "prompt_tokens": 381,
+                        "total_tokens": 409
+                    },
+                    "model_name": "ibm/granite-4-h-small",
+                    "system_fingerprint": "",
+                    "finish_reason": "tool_calls"
+                },
+                "type": "ai",
+                "name": null,
+                "id": "chatcmpl-3ee96e57e4c4b3e9e81a4d234a150342",
+                "tool_calls": [
+                    {
+                        "name": "get_current_weather",
+                        "args": {
+                            "location": "Miami"
+                        },
+                        "id": "chatcmpl-tool-5e1fac7ec0134aadba949b4be4748956",
+                        "type": "tool_call"
+                    }
+                ],
+                "invalid_tool_calls": [],
+                "usage_metadata": {
+                    "input_tokens": 381,
+                    "output_tokens": 28,
+                    "total_tokens": 409
+                }
+            },
+            {
+                "content": "{\"description\": \"clear sky\", \"temperature\": 22.15, \"humidity\": 84}",
+                "additional_kwargs": {},
+                "response_metadata": {},
+                "type": "tool",
+                "name": "get_current_weather",
+                "id": "3321b83e-ad6a-4c53-803f-57aa42dcaa5f",
+                "tool_call_id": "chatcmpl-tool-5e1fac7ec0134aadba949b4be4748956",
+                "artifact": null,
+                "status": "success"
+            },
+            {
+                "content": "The current weather in Miami is **clear sky** with a temperature of **22.15\u202f\u00b0C** and a humidity level of **84\u202f%**.",
+                "additional_kwargs": {},
+                "response_metadata": {
+                    "token_usage": {
+                        "completion_tokens": 35,
+                        "prompt_tokens": 436,
+                        "total_tokens": 471
+                    },
+                    "model_name": "ibm/granite-4-h-small",
+                    "system_fingerprint": "",
+                    "finish_reason": "stop"
+                },
+                "type": "ai",
+                "name": null,
+                "id": "chatcmpl-0b97f515a3c0ed4b56d4e4725ba5f4f7",
+                "tool_calls": [],
+                "invalid_tool_calls": [],
+                "usage_metadata": {
+                    "input_tokens": 436,
+                    "output_tokens": 35,
+                    "total_tokens": 471
+                }
+            }
+        ]
+    },
+    "sessionId": null,
+    "release": null,
+    "version": null,
+    "userId": null,
+    "metadata": {
+        "resourceAttributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.39.1",
+            "service.name": "unknown_service"
+        },
+        "scope": {
+            "name": "langfuse-sdk",
+            "version": "3.12.0",
+            "attributes": {
+                "public_key": "pk-lf-xxxxxxxxxx"
+            }
+        }
+    },
+    "tags": [],
+    "public": false,
+    "environment": "default",
+    "htmlPath": "/project/cmk06t33a0006o007bqry3lcw/traces/729db7b424cd21fe34baa2c1e670e059",
+    "latency": 2.064,
+    "totalCost": 0.0,
+    "observations": [
+        {
+            "id": "8593a5a9be6aef20",
+            "traceId": "729db7b424cd21fe34baa2c1e670e059",
+            "type": "GENERATION",
+            "name": "ChatWatsonx",
+            "startTime": "2026-02-20T03:54:26.635000Z",
+            "endTime": "2026-02-20T03:54:27.553000Z",
+            "completionStartTime": null,
+            "model": "ibm/granite-4-h-small",
+            "modelParameters": {},
+            "input": [
+                {
+                    "role": "user",
+                    "content": "What is the weather in Miami?"
+                },
+                {
+                    "role": "tool",
+                    "content": {
+                        "type": "function",
+                        "function": {
+                            "name": "get_stock_price",
+                            "description": "Retrieves the lowest and highest stock prices for a given ticker and date.\n\nArgs:\n    ticker: The stock ticker symbol, for example, \"IBM\".\n    date: The date in \"YYYY-MM-DD\" format for which you want to get stock prices.\n\nReturns:\n    A dictionary containing the low and high stock prices on the given date.",
+                            "parameters": {
+                                "properties": {
+                                    "ticker": {
+                                        "type": "string"
+                                    },
+                                    "date": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "ticker",
+                                    "date"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                {
+                    "role": "tool",
+                    "content": {
+                        "type": "function",
+                        "function": {
+                            "name": "get_current_weather",
+                            "description": "Fetches the current weather for a given location (default: San Francisco).\n\nArgs:\n    location: The name of the city for which to retrieve the weather information.\n\nReturns:\n    A dictionary containing weather information such as temperature in celsius, weather description, and humidity.",
+                            "parameters": {
+                                "properties": {
+                                    "location": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "location"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            ],
+            "version": null,
+            "metadata": {
+                "tags": [
+                    "seq:step:1"
+                ],
+                "langgraph_step": 1,
+                "langgraph_node": "model",
+                "langgraph_triggers": [
+                    "branch:to:model"
+                ],
+                "langgraph_path": [
+                    "__pregel_pull",
+                    "model"
+                ],
+                "langgraph_checkpoint_ns": "model:374af59a-369e-05fa-6fc2-0f5015d20df9",
+                "checkpoint_ns": "model:374af59a-369e-05fa-6fc2-0f5015d20df9",
+                "ls_provider": "ibm",
+                "ls_model_type": "chat",
+                "ls_model_name": "ibm/granite-4-h-small",
+                "resourceAttributes": {
+                    "telemetry.sdk.language": "python",
+                    "telemetry.sdk.name": "opentelemetry",
+                    "telemetry.sdk.version": "1.39.1",
+                    "service.name": "unknown_service"
+                },
+                "scope": {
+                    "name": "langfuse-sdk",
+                    "version": "3.12.0",
+                    "attributes": {
+                        "public_key": "pk-lf-xxxxxxxxxx"
+                    }
+                }
+            },
+            "output": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "name": "get_current_weather",
+                        "args": {
+                            "location": "Miami"
+                        },
+                        "id": "chatcmpl-tool-5e1fac7ec0134aadba949b4be4748956",
+                        "type": "tool_call"
+                    }
+                ]
+            },
+            "usage": {
+                "input": 381,
+                "output": 28,
+                "total": 409,
+                "unit": "TOKENS"
+            },
+            "level": "DEFAULT",
+            "statusMessage": null,
+            "parentObservationId": "571d50d10d0064ee",
+            "promptId": null,
+            "usageDetails": {
+                "input": 381,
+                "output": 28,
+                "total": 409
+            },
+            "costDetails": {},
+            "environment": "default",
+            "promptName": null,
+            "promptVersion": null,
+            "modelId": null,
+            "inputPrice": 0.0,
+            "outputPrice": 0.0,
+            "totalPrice": 0.0,
+            "calculatedInputCost": null,
+            "calculatedOutputCost": null,
+            "calculatedTotalCost": 0.0,
+            "latency": 0.918,
+            "timeToFirstToken": null,
+            "projectId": "cmk06t33a0006o007bqry3lcw",
+            "totalTokens": 409,
+            "createdAt": "2026-02-20T03:54:31.666Z",
+            "updatedAt": "2026-02-20T03:54:31.733Z",
+            "completionTokens": 28,
+            "usagePricingTierId": null,
+            "promptTokens": 381,
+            "usagePricingTierName": null,
+            "unit": "TOKENS"
+        }
+    ],
+    "scores": [],
+    "updatedAt": "2026-02-20T03:54:31.730Z",
+    "projectId": "cmk06t33a0006o007bqry3lcw",
+    "externalId": null,
+    "bookmarked": false,
+    "createdAt": "2026-02-20T03:54:31.677Z"
+}
