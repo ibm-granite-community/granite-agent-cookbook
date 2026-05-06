@@ -80,10 +80,10 @@ model_params:
   max_tokens: 1000
 ```
 
-| Approach              | Pros                                                                                                                  | Cons                                                                                                                            |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| **Prompts as Code**   | Strong typing and IDE support; automatic validation via linting/type-checking; changes go through standard PR review | Requires code deployment for every prompt change; slower iteration cycles; less accessible to non-engineers                 |
-| **Prompts as Config** | Fast iteration without code deployments; non-engineers can update prompts; supports A/B testing and rollbacks         | Harder to validate before deployment; risk of runtime errors from malformed config; requires separate versioning strategy     |
+| Approach | Pros | Cons |
+| --- | --- | --- |
+| **Prompts as Code** | Strong typing and IDE support; automatic validation via linting/type-checking; changes go through standard PR review | Requires code deployment for every prompt change; slower iteration cycles; less accessible to non-engineers |
+| **Prompts as Config** | Fast iteration without code deployments; non-engineers can update prompts; supports A/B testing and rollbacks | Harder to validate before deployment; risk of runtime errors from malformed config; requires separate versioning strategy |
 
 **Recommendation:** Use a hybrid approach—prompts live in version-controlled config files, but loading and validation logic is code. The config drives the content; the code enforces the contract. This balances iteration speed with safety.
 
