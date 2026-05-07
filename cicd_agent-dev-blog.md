@@ -203,9 +203,9 @@ Packaging an agent for production means more than containerizing code. It means 
 
 For implementation details, see the [MCP specification](https://modelcontextprotocol.io/docs) and available SDKs.
 
-**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent handoffs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
+**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent hand offs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
 
-**Packaging as an HTTP Server:** If you're not adopting MCP or A2A protocols, a standard HTTP API is a proven approach. The packaging decision here is driven by your UX requirements:
+**Packaging as an HTTP Server:** If you're not adopting MCP or A2A protocols, a standard HTTP API is a proven approach. The packaging decision here is driven by your requirements:
 
 - **Streaming responses:** If your agent needs to provide real-time feedback as it reasons through a problem or generates long responses, you'll need to support Server-Sent Events (SSE) or WebSocket connections. This affects your infrastructure choices (load balancers must support long-lived connections) and your testing strategy (you need to validate streaming behavior, not just final outputs).
 
