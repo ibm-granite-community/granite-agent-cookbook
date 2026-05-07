@@ -4,17 +4,6 @@
 
 ---
 
-## Table of Contents
-
-1. [Introduction](#1-introduction)
-2. [Source Management](#2-source-management)
-3. [Prompt Engineering & Externalization](#3-prompt-engineering--externalization)
-4. [Packaging & Containerization](#4-packaging--containerization)
-5. [Observability & Monitoring](#5-observability--monitoring)
-6. [Conclusion](#6-conclusion)
-
----
-
 ## 1. Introduction
 
 Continuous Integration (CI) automates testing and validation of code changes, while Continuous Deployment (CD) automates the release of validated changes to production. Together, CI/CD pipelines ensure that software ships reliably and quickly.
@@ -22,7 +11,7 @@ Continuous Integration (CI) automates testing and validation of code changes, wh
 Deploying AI agents to production requires rethinking these traditional CI/CD practices. This guide covers the essential disciplines for building production-ready agent systems:
 
 1. [Source Management](#2-source-management)
-2. [Prompt Engineering & Externalization](#3-prompt-engineering--externalization)
+2. [Testing & Validating Prompt Changes](#3-testing--validating-prompt-changes)
 3. [Packaging & Containerization](#4-packaging--containerization)
 4. [Observability & Monitoring](#5-observability--monitoring)
 
@@ -64,9 +53,9 @@ class AgentPrompts:
     """
 ```
 
-The downside? Friction. If your product team or a prompt engineer needs to iterate on tone or phrasing, every change requires a code deployment. At the speed most agent products need to iterate, that friction adds up fast.
+The downside? Friction. If your product team or a prompt engineer needs to iterate on tone or phrasing, every change requires a code deployment. At the speed most agent products need to iterate, that friction adds up fast. There's also the risk of vendor or model lock-in. Codifying prompts in your application code can make it harder to experiment with different models, since prompts often need customization per model to achieve optimal results. What works well for one model may perform poorly on another.
 
-**Prompts as configuration** solves this by moving the prompt to YAML or JSON files that can be updated and deployed independently of application code. Prompt registries like [LangSmith](https://www.langchain.com/langsmith) and [Braintrust](https://www.braintrust.dev) are built around this model.
+**Prompts as configuration** solves this by moving the prompt to YAML or JSON files that can be updated and deployed independently of application code. This approach also makes it easier to maintain model-specific prompt variants without code changes. Prompt registries like [LangSmith](https://www.langchain.com/langsmith) and [Braintrust](https://www.braintrust.dev) are built around this model.
 
 ```yaml
 # prompts/v2.1.0/system_prompt.yaml
@@ -160,7 +149,7 @@ def load_prompt_config(path: str, expected_version: str = None) -> dict:
     return config
 ```
 
-In Kubernetes, a startup crash means the rollout halts and your previous version stays live. That's not a failure. That's the CI/CD gate working. Your pipeline can invoke `bootstrap_agent()` as a smoke-test stage and catch mismatches between a new prompt version and its tool dependencies before any traffic reaches the service.
+In a Kubernetes deployment, a startup crash means the rollout halts and your previous version stays live. That's not a failure. That's the CI/CD gate working. Your pipeline can invoke `bootstrap_agent()` as a smoke-test stage and catch mismatches between a new prompt version and its tool dependencies before any traffic reaches the service.
 
 This pattern is framework-agnostic and follows the same approach across implementations: initialize on application start, configure LLM client and tools from environment variables, validate before serving traffic.
 
@@ -168,13 +157,15 @@ Once you've nailed down how your agent's identity is stored and loaded, the next
 
 ---
 
-## 3. Prompt Engineering & Externalization
+## 3. Testing & Validating Prompt Changes
 
-There's a mindset shift that separates teams who manage prompt changes confidently from teams who are perpetually nervous about them. It's treating a prompt not as a configuration knob, but as a specification.
+There's a mindset shift that separates teams who manage prompt changes confidently from teams who are perpetually nervous about them. It's treating a prompt not as a configuration knob, but as a specification that must be tested.
 
-When you change a configuration knob, such as a timeout value, a retry limit, you're adjusting a parameter. The system's behavior changes in a bounded, predictable way. When you change a prompt, you're changing a specification that a language model interprets with some degree of latitude. The effects can cascade in ways you didn't anticipate, and they often don't surface until the right edge case shows up in production.
+When you change a configuration knob, such as a timeout value, you're adjusting a parameter. The system's behavior changes in a bounded, predictable way. When you change a prompt, you're changing a specification that a language model interprets with some degree of latitude. The effects can cascade in ways you didn't anticipate, and they often don't surface until the right edge case shows up in production.
 
-That shift in framing has practical consequences. It means prompts need version control, peer review, staged rollout, and regression testing — the same disciplines you apply to application code. And it means the question "does this prompt work?" can't be answered with a pass/fail assertion. You need an evaluation framework.
+This is why prompts need the same rigor as application code: version control, peer review, regression testing, and end-to-end validation before promotion through your pipeline. The question "does this prompt work?" can't be answered with a pass/fail assertion. You need a comprehensive testing strategy.
+
+For detailed guidance on agent testing approaches, see our guide on [**Testing Agents**](testing_agents.md), which covers regression detection, test case design, and evaluation frameworks.
 
 ### The Prompt Lifecycle
 
@@ -186,15 +177,17 @@ A mature lifecycle has five stages:
 4. Production — controlled rollout with active monitoring.
 5. Iteration — feed monitoring insights back into development.
 
-Promotion between stages should be gated. A prompt that hasn’t cleared evaluation doesn’t reach staging. A prompt that hasn’t cleared staging doesn’t reach production. Automated gates enforce this, and humans adjudicate when scores are ambiguous.
+Promotion between stages should be gated by automated tests. A prompt that hasn't passed regression tests doesn't reach staging. A prompt that hasn't cleared end-to-end validation in staging doesn't reach production. These gates catch breaking changes before they impact users.
 
 ### Two Evaluation Patterns
 
-**Golden dataset testing** is the foundation. You maintain a curated set of inputs drawn from real production traffic or hand-crafted to cover edge cases, paired with expected outputs or scoring rubrics. Every prompt change runs against this dataset, giving you a quantitative before-and-after comparison. The discipline is keeping the dataset alive by adding new cases when production surfaces gaps and pruning cases that no longer reflect real usage.
+**Regression testing with golden datasets** is the foundation. You maintain a curated set of inputs drawn from real production traffic or hand-crafted to cover edge cases, paired with expected outputs or scoring rubrics. Every prompt change runs against this dataset as a regression test, giving you a quantitative before-and-after comparison. This catches breaking changes immediately. The discipline is keeping the dataset alive by adding new cases when production surfaces gaps and pruning cases that no longer reflect real usage.
 
-**LLM-as-a-judge** handles the cases where expected outputs are too open-ended to specify in advance. A strong model evaluates responses against a rubric (was the answer accurate? appropriately scoped? did it hallucinate?) and returns a score. Anthropic's [evaluation guide](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations) describes this pattern in detail. The practical value is that it catches qualitative drift that golden datasets miss, like a prompt change that doesn't break any specific test case but makes responses subtly more verbose, less decisive, or more prone to hedging.
+**End-to-end validation** ensures the full agent workflow functions correctly. This goes beyond unit testing individual components to validate that tool calls, reasoning chains, and final responses work together as expected. End-to-end tests run in staging environments with realistic workloads before any prompt reaches production.
 
-Used together, these two patterns give you precision and coverage. Golden datasets catch exact regressions. LLM-as-a-judge catches the drift that's hard to specify but easy to recognize.
+**LLM-as-a-judge evaluation** handles the cases where expected outputs are too open-ended to specify in advance. A strong model evaluates responses against a rubric (was the answer accurate? appropriately scoped? did it hallucinate?) and returns a score. Anthropic's [evaluation guide](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations) describes this pattern in detail. The practical value is that it catches qualitative drift that golden datasets miss, like a prompt change that doesn't break any specific test case but makes responses subtly more verbose, less decisive, or more prone to hedging.
+
+Used together, these three patterns give you comprehensive coverage. Regression tests catch breaking changes. End-to-end validation ensures system-level correctness. LLM-as-a-judge catches the subtle drift that's hard to specify but easy to recognize.
 
 With your prompts versioned, evaluated, and deployed with confidence, the next challenge is packaging. How do you ensure the agent you tested is exactly the agent you ship?
 
@@ -210,7 +203,15 @@ Packaging an agent for production means more than containerizing code. It means 
 
 For implementation details, see the [MCP specification](https://modelcontextprotocol.io/docs) and available SDKs.
 
-**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent hand offs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
+**Packaging for A2A Communication:** The [Agent-to-Agent (A2A) Protocol](https://www.ibm.com/think/topics/agent2agent-protocol) standardizes agent-to-agent handoffs. If your agent orchestrates other agents or accepts delegated tasks, packaging for A2A means exposing a standardized interface for task delegation and result handling. The critical point is that A2A contracts between agents are versioned interfaces. Multi-agent workflows need integration tests that validate these contracts, since a routing agent expecting v1.0 of a research agent's interface will break if the research agent ships v2.0 with incompatible changes.
+
+**Packaging as an HTTP Server:** If you're not adopting MCP or A2A protocols, a standard HTTP API is a proven approach. The packaging decision here is driven by your UX requirements:
+
+- **Streaming responses:** If your agent needs to provide real-time feedback as it reasons through a problem or generates long responses, you'll need to support Server-Sent Events (SSE) or WebSocket connections. This affects your infrastructure choices (load balancers must support long-lived connections) and your testing strategy (you need to validate streaming behavior, not just final outputs).
+
+- **Non-streaming responses:** For simpler use cases where the full response can be returned at once, a standard REST API is sufficient. This simplifies deployment and testing but means users wait for the complete response before seeing any output.
+
+The choice between streaming and non-streaming isn't just technical. It shapes the user experience and your CI/CD pipeline. Streaming requires testing partial outputs and handling connection interruptions gracefully. Non-streaming requires managing timeout expectations and providing clear feedback during long-running operations.
 
 ### Standard Containerization Practices
 
