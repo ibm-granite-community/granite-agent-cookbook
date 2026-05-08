@@ -1,8 +1,8 @@
-# Techniques for Working with Small Language Models
+# Techniques for Building Agentic Applications with Small Language Models
 
-Building AI systems that leverage language models is no longer the exclusive domain of organizations with massive compute budgets. While Large Language Models (LLMs) like GPT-4 have captured headlines with their impressive capabilities, a quieter revolution is underway: Small Language Models (SLMs) are proving that size isn't everything when it comes to production-ready AI.
+Building AI agents is no longer the exclusive domain of organizations with massive compute budgets. Agentic systems — where a model plans, calls tools, reflects on results, and iterates — can trigger dozens of model invocations per user query. At frontier-model pricing, those costs compound fast. Small Language Models (SLMs) are proving that size isn't everything: they deliver faster responses, lower costs per call, and more predictable behavior in the constrained, repetitive tasks that make up most of an agent's work.
 
-This guide explores the techniques and approaches for working effectively with SLMs. Rather than viewing them as compromised versions of their larger siblings, we'll examine how SLMs can be the optimal choice for many enterprise scenarios - delivering faster responses, lower costs, and more predictable behavior. By understanding the trade-offs and mastering the techniques specific to smaller models, you'll be equipped to build robust, efficient AI systems that scale.
+This guide covers the techniques you need to build effective agentic applications with SLMs. Rather than viewing them as compromised versions of their larger siblings, we'll examine how SLMs can be the optimal choice for agent workloads — and how to structure your system so each component uses the right-sized model.
 
 ## What is a Small Language Model?
 
@@ -20,6 +20,8 @@ Small Language Models are AI systems designed to process and generate natural la
 
 The decision to use an SLM isn't about settling for less - it's about optimizing for your actual requirements. Several factors make SLMs not just viable, but preferable in many scenarios.
 
+**Agent Applications** - This is the most compelling case for SLMs today. A single user query to an agentic system may trigger 5–20 model calls: intent classification, tool selection, parameter extraction, result summarization, self-critique, and re-planning. At frontier-model rates, this compounds into significant cost per interaction. SLMs let you run these loops affordably — often at 10–30x lower cost per call — without sacrificing the latency that makes agents feel responsive. Most steps in an agentic loop are constrained, repetitive tasks (classify, extract, route) where a well-prompted SLM matches or exceeds a larger model's accuracy.
+
 **Cost Considerations** - The economics are compelling. Running a 3B parameter model can be 10-30x cheaper than operating a 405B parameter model. This isn't just about inference costs - training, fine-tuning, and operational expenses all scale down proportionally. For applications requiring high throughput or continuous operation, these savings compound dramatically. A customer service chatbot handling millions of interactions monthly could see cost reductions from thousands to hundreds of dollars.
 
 **Hardware Considerations** - SLMs democratize AI deployment. They can run on consumer-grade GPUs, single A100s, or even CPUs in some cases. Where LLMs might require multi-GPU setups with 80GB+ VRAM per card, an SLM like Granite 4.0 H-Micro runs comfortably on a 15GB T4 GPU. This means organizations can deploy AI capabilities without investing in specialized infrastructure, and development teams can experiment locally without cloud dependencies.
@@ -28,7 +30,7 @@ The decision to use an SLM isn't about settling for less - it's about optimizing
 
 **Scope of Applications** - When your application has well-defined boundaries, SLMs shine. Consider these scenarios: structured data extraction from documents, classification tasks with known categories, domain-specific question answering, code completion for specific frameworks, or sentiment analysis. These tasks don't require the open-ended reasoning of frontier models - they need reliable, fast execution within a constrained domain. An SLM fine-tuned for medical record processing will outperform a general LLM at that specific task while costing a fraction to operate.
 
-The strategic insight is recognizing that most production AI workloads are repetitive, scoped, and non-conversational. They're the digital equivalent of assembly line operations - requiring efficiency and predictability over creative brilliance.
+The strategic insight is recognizing that most steps in an agentic workflow are repetitive and scoped — requiring efficiency and predictability over creative brilliance.
 
 ## How to Identify an SLM Model
 
@@ -58,71 +60,25 @@ The choice between SLMs and LLMs isn't binary - it's about matching capabilities
 | **Context Window** | Often limited (2K-8K tokens typical). Some recent models support 32K-128K tokens. | Large context windows (32K-200K+ tokens). Better for long document processing. |
 | **Robustness** | More prone to errors on ambiguous inputs or adversarial examples. Requires careful input validation. | More robust to edge cases and ambiguous queries. Better error handling out-of-box. |
 
-**The Heterogeneous Approach** - The most sophisticated systems don't choose one or the other exclusively. They use SLMs for routine operations and invoke LLMs selectively for complex reasoning or open-ended tasks. Think of SLMs as the efficient workers and LLMs as expert consultants - you don't need the consultant for every decision.
-
-## Techniques for Migrating to SLMs
-
-Moving from LLM-based systems to SLM-optimized architectures requires methodical planning. Here's a practical framework for migration:
-
-**1. Establish Testing Infrastructure**
-
-Before changing anything, build the measurement system. Create a comprehensive evaluation dataset that covers your application's real-world usage patterns - not just happy path scenarios, but edge cases, ambiguous inputs, and failure modes. This dataset becomes your ground truth for measuring whether migration maintains or improves performance.
-
-Define success metrics that matter to your business: task completion rate, response accuracy, schema validity (for structured outputs), latency percentiles (p50, p95, p99), and cost per successful task. These metrics will guide your decisions and prove ROI.
-
-Implement A/B testing infrastructure that lets you run SLM and LLM variants in parallel, measuring performance differences on live traffic. This de-risks the transition and provides empirical evidence for decision-making.
-
-**2. Analyze and Cluster Your Workload**
-
-Not all LLM invocations are created equal. Instrument your existing system to log every LLM call with metadata: the task type, input characteristics, output requirements, success/failure status, and context length. Run this for at least a week to capture usage patterns.
-
-Cluster these invocations by similarity. You'll likely find that 60-80% of calls fall into a small number of repetitive patterns: "extract entities from customer emails," "classify support tickets," "generate SQL from natural language," "summarize meeting notes." These clusters are your migration candidates.
-
-Identify which clusters have: well-defined inputs and outputs, constrained domains, tolerance for occasional errors, or high volume that makes cost savings significant. These become your priority targets for SLM replacement.
-
-**3. Systematic Function Reduction**
-
-LLMs often accumulate tool sprawl - dozens of available functions when any single task uses only 2-3. SLMs perform better with focused tool sets. For each workload cluster, audit which tools are actually needed. Create domain-specific SLMs with minimal tool surfaces.
-
-Instead of one agent with 50 tools, deploy five specialized agents each with 5-10 tools. This focused approach dramatically improves tool selection accuracy for smaller models while reducing context length requirements.
-
-**4. Implement Clear Swimlanes**
-
-Define explicit boundaries for what each SLM handles. Use routing logic or orchestration layers to direct requests to the appropriate specialized model. This "domain locking" prevents SLMs from receiving queries outside their competency.
-
-For example: a customer service system might route product questions to a product-knowledge SLM, billing issues to a billing-specialist SLM, and only escalate complex, multi-domain problems requiring integration to an LLM.
-
-**5. Adopt Subagent Architectures**
-
-Rather than replacing a monolithic LLM agent wholesale, decompose it into specialized subagents. The architecture looks like this: a lightweight router (which can itself be an SLM) analyzes incoming requests and delegates to domain-specific SLM subagents. Each subagent operates independently with its own tools and context.
-
-This pattern provides isolation (preventing cross-contamination between domains), parallelization (multiple subagents can operate concurrently), and incremental migration (replace one subagent at a time, not the entire system).
-
-**6. Task Splitting Strategy**
-
-For complex workflows, explicitly split them into discrete steps that can be handled by different models. Instead of asking an LLM to "analyze this contract, extract key terms, identify risks, and draft amendments," split this into: document parsing (SLM), term extraction (fine-tuned SLM), risk assessment (domain-specific SLM fine-tuned on legal risk data), and amendment drafting (LLM for creative legal writing).
-
-Each step uses the most appropriate tool, optimizing the overall cost-performance profile.
-
-**7. Progressive Rollout**
-
-Never migrate everything at once. Start with your lowest-risk, highest-volume cluster. Deploy the SLM variant to 5% of traffic, then 20%, then 50%, monitoring metrics at each stage. Only proceed when confidence is high.
-
-Maintain LLM fallback paths. If an SLM fails or produces low-confidence output, automatically retry with the LLM. This ensures no degradation in user experience while you refine the system.
+**The Heterogeneous Approach** - The most sophisticated agent systems don't choose one or the other exclusively. They use SLMs for routine operations (classification, extraction, tool selection) and invoke LLMs selectively for complex reasoning or open-ended tasks. Think of SLMs as the efficient workers and LLMs as expert consultants — you don't need the consultant for every step in the loop.
 
 ## Techniques for Working with SLMs
 
-Operating SLMs effectively requires different techniques than prompting large models. Smaller models need more explicit guidance and contextual support.
+Operating SLMs effectively in agentic systems requires different techniques than prompting large models. Smaller models need more explicit guidance and contextual support.
 
-### In-Context Learning & Few-Shot Prompting
+### Prompting Tips for SLMs
 
-While LLMs often perform well with zero-shot prompting ("here's a task, go do it"), SLMs typically need examples to understand the desired behavior. This is where in-context learning becomes critical.
+Prompting discipline matters more with SLMs than with frontier models. Smaller models have less latent knowledge and weaker emergent reasoning — they rely on pattern matching against examples and precise instructions rather than abstract understanding. That predictability is an asset: when you provide clear structure, SLMs follow it reliably.
 
-**Why It Matters for SLMs** - Smaller models have less latent knowledge and weaker emergent reasoning abilities. They rely more heavily on pattern matching against provided examples rather than abstract understanding. The good news: this is efficient and predictable. When you provide clear examples, SLMs can match them reliably.
+> For comprehensive SLM-specific prompting techniques, see [Prompting SLMs for Agentic Applications: Best Practices](https://github.com/ibm-granite-community/granite-agent-cookbook/blob/main/model_prompting_best_practices.md)
 
-**Practical Implementation** - For any task with an SLM, include 3-10 demonstrations in your prompt. These examples should show input-output pairs that cover the range of expected variations. Format matters significantly - maintain consistent structure across examples.
+A few key principles:
 
-Example for entity extraction with a 3B model:
+- **Be explicit about role and output format.** Start with "You are an expert X" and end with a concrete format constraint ("Return only valid JSON", "Choose exactly one of: [A, B, C]").
+- **Always include examples.** For any task, include 3–10 input/output demonstrations. SLMs rely on pattern matching against these far more than LLMs do.
+- **Use retrieval-augmented few-shot selection.** Rather than fixed examples, dynamically select the most semantically similar examples from a larger pool. This outperforms static examples across diverse inputs.
+
+Example — few-shot entity extraction with a 3B model:
 
 ```
 Extract person names and locations from the following texts.
@@ -139,31 +95,6 @@ Output: {"persons": ["Alice", "Bob"], "locations": ["London"]}
 Now extract from: "Mary Johnson and her colleague traveled to Berlin for the summit."
 Output:
 ```
-
-**Optimization Tips** - Use retrieval-augmented few-shot learning: dynamically select the most relevant examples from a larger pool based on similarity to the current input. This works better than static examples. Ensure examples cover edge cases: ambiguous inputs, empty results, malformed data. The SLM learns handling strategies from these.
-
-### Instruction Tuning & Prompt Engineering
-
-Precision in instructions becomes paramount with SLMs. Vague prompts that work with LLMs often fail with smaller models.
-
-**Structure Your Instructions** - Begin with explicit role definition ("You are an expert SQL generator"), provide clear task descriptions ("Convert the following natural language question into a valid PostgreSQL query"), specify output constraints ("Return only the SQL query, no explanations"), and list any assumptions or rules ("Use snake_case for table names", "Always include LIMIT clauses for safety").
-
-**Prompt Templates for Consistency** - Create reusable templates for common tasks. This standardization helps SLMs learn patterns faster. For Granite models and similar SLMs, structured formats work particularly well:
-
-```
-<|start_of_role|>system<|end_of_role|>
-You are a helpful assistant specialized in data analysis. 
-Respond in valid JSON format only.
-<|end_of_text|>
-
-<|start_of_role|>user<|end_of_role|>
-Analyze the sentiment of: "This product exceeded my expectations!"
-<|end_of_text|>
-
-<|start_of_role|>assistant<|end_of_role|>
-```
-
-**Constraint-Based Prompting** - Explicitly constrain the output space. For classification: "Choose exactly one: [POSITIVE, NEUTRAL, NEGATIVE]". For generation: "Response must be 50-100 words". For structured output: "Return JSON matching this schema: {schema}". These constraints help smaller models stay on task.
 
 ### Retrieval-Augmented Generation (RAG)
 
@@ -299,66 +230,19 @@ def handle_query(user_input: str):
 
 This hybrid approach plays to each component's strengths - predictable code execution for logic, flexible language models for language.
 
-## Working with Granite 4 SLM Family
+For a deeper look at patterns that blend code logic and model calls in production agents, see [Mellea](https://mellea.ai/).
 
-IBM's Granite 4.0 family represents the state-of-the-art in production-ready SLMs. Understanding their specifics helps you leverage them effectively.
+## Fine-Tuning Consideration
 
-**Model Variants** - Granite-4.0-H-Small (32B total parameters, 9B active in MoE configuration): enterprise workhorse for complex workflows, RAG systems, and multi-tool agents. Granite-4.0-H-Tiny (7B total, 1B active): high-volume, lower-complexity tasks like summarization and classification. Granite-4.0-H-Micro (3B dense): lightweight deployment for edge devices and high-throughput scenarios. Granite-4.0-Nano (350M and 1B): on-device deployment for mobile and IoT applications.
+As you build your agent application, you may eventually reach a point where prompting, RAG, and careful tool design aren't enough to hit your accuracy target for a specific task. At that point, fine-tuning is worth considering — and with SLMs, it's far more accessible than most developers expect.
 
-**Hybrid Mamba-2 Architecture** - Granite's distinctive feature is combining Mamba-2 state space models with transformers. This delivers over 70% memory reduction compared to pure transformer models. Practically, this means you can handle much longer contexts and more concurrent sessions on the same hardware.
+**Fine-tuning should be a last resort.** Exhaust prompting techniques, RAG integration, and tool design first. Many applications never need it. Fine-tuning adds operational overhead (maintaining a custom model, retraining when data drifts) that prompting-based approaches avoid.
 
-**Native Capabilities** - Out of the box, Granite 4.0 supports: structured JSON output (critical for reliable parsing), tool calling with function schemas, multilingual processing (12+ languages), RAG optimization (designed for document-intensive workflows), and long context (up to 128K tokens).
+**When it makes sense:** If a specific step in your agent loop — say, classifying support tickets or extracting structured fields from domain documents — consistently falls short despite good prompting, a small fine-tuning run on labeled examples can push accuracy past what a general model achieves.
 
-**Deployment Options** - Granite runs anywhere: local deployment via Ollama or LM Studio for development, cloud deployment via Replicate or watsonx.ai, HuggingFace integration for fine-tuning with Transformers, or quantized versions (4-bit, 8-bit) for even lower resource requirements.
+**Why it's accessible with SLMs:** Parameter-efficient fine-tuning with LoRA/QLoRA means you can adapt a 3B Granite model on a single T4 GPU in a matter of hours, not days. The Apache 2.0 license on IBM Granite models means no restrictions on fine-tuned derivatives. You typically need only 100–500 labeled examples to see meaningful improvement on a well-scoped task.
 
-**Fine-Tuning Granite** - Use LoRA/QLoRA for parameter-efficient fine-tuning. A 3B Granite model can be fine-tuned on a single T4 GPU in hours, not days. Tools like Unsloth provide 2x speedups and 50% memory reduction during training.
-
-Example fine-tuning setup:
-
-```python
-from unsloth import FastLanguageModel
-
-model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name="ibm-granite/granite-4.0-h-micro",
-    max_seq_length=2048,
-    load_in_4bit=True,  # Enables 4-bit quantization for efficiency
-)
-
-# Add LoRA adapters
-model = FastLanguageModel.get_peft_model(
-    model,
-    r=16,  # LoRA rank
-    target_modules=["q_proj", "v_proj"],
-    lora_alpha=16,
-    lora_dropout=0.05,
-)
-
-# Fine-tune on your domain-specific data
-```
-
-**Tool Calling with Granite** - Granite natively understands function schemas. Define tools clearly and the model will generate valid calls:
-
-```python
-tools = [{
-    "type": "function",
-    "function": {
-        "name": "get_weather",
-        "description": "Get current weather for a location",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {"type": "string"},
-                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
-            },
-            "required": ["location"]
-        }
-    }
-}]
-
-# Model generates structured tool calls that your code can parse and execute
-```
-
-**Optimization Best Practices** - For production deployment: use quantization (4-bit or 8-bit) to reduce memory footprint without significant accuracy loss, implement batching to maximize throughput, enable KV cache for multi-turn conversations to reduce redundant computation, and use vLLM or TensorRT-LLM for optimized serving.
+For code examples and step-by-step setup, see the [IBM Granite Fine-Tuning with Unsloth guide](https://www.ibm.com/granite/docs/fine-tune/unsloth).
 
 ## Practical Example: Document Classification System
 
@@ -433,9 +317,9 @@ If ticket requires multi-step reasoning ("My billing is wrong BECAUSE you didn't
 
 ## Next Steps
 
-Ready to put these techniques into practice? The best way to learn is by doing. Here's how to get started with your own SLM implementation:
+Ready to put these techniques into practice? The best way to learn is by doing. Here's how to get started building your first SLM-powered agent:
 
-**Start with Granite 4.0** - IBM's Granite models provide an excellent entry point for production SLM work. They're open source (Apache 2.0), well-documented, and designed specifically for enterprise use cases. The hybrid Mamba-2 architecture means you get strong performance without the typical memory overhead of pure transformer models.
+**Start with Granite 4.0** - IBM's Granite models provide an excellent entry point for production SLM work. They're open source (Apache 2.0), well-documented, and designed specifically for enterprise use cases. The hybrid Mamba-2 architecture means you get strong performance without the typical memory overhead of pure transformer models. Granite natively supports structured JSON output, tool calling, and RAG-optimized inference — exactly what agentic applications need.
 
 **Hands-On Tutorial** - For a comprehensive, practical guide to running and fine-tuning Granite models, check out [How to run and fine-tune IBM Granite AI models for your projects](https://allthingsopen.org/articles/how-to-run-and-fine-tune-ibm-granite-ai-models). This tutorial walks you through:
 - Setting up your local development environment
@@ -444,28 +328,28 @@ Ready to put these techniques into practice? The best way to learn is by doing. 
 - Implementing time series forecasting with Granite
 - Deploying optimized models to production
 
-**Build Your First SLM Application** - Choose a well-scoped problem from your work: document classification, data extraction, query routing, or content summarization. Start with a baseline using few-shot prompting, build an evaluation dataset (even 50-100 examples is enough), iterate on prompt engineering and RAG integration, and then consider fine-tuning if baseline performance isn't sufficient.
-
-**Join the Community** - The SLM ecosystem is rapidly evolving. Engage with communities around Granite, Phi, Llama, and other model families. Share your results, learn from others' production deployments, and contribute back to open source projects. The collective knowledge of practitioners often surpasses what's in research papers.
+**Build Your First SLM Agent** - Choose a well-scoped problem: a classification step, a data extraction task, or a routing layer. Start with a baseline using few-shot prompting, build an evaluation dataset (even 50-100 examples is enough), iterate on prompt engineering and RAG integration, and only consider fine-tuning if baseline performance isn't sufficient.
 
 **Measure Everything** - As you experiment, maintain rigorous evaluation practices. Track accuracy, latency, cost, and reliability. The data you collect will guide your optimization efforts and prove ROI to stakeholders. Remember: production AI is an engineering discipline, not just a research problem.
 
-The techniques in this guide aren't theoretical - they're battle-tested approaches from real-world deployments. Your first SLM project might feel constrained compared to the creative possibilities of frontier models. But when you see the cost savings, deployment flexibility, and reliable performance, you'll understand why SLMs are becoming the workhorses of production AI.
+The techniques in this guide aren't theoretical — they're battle-tested approaches from real-world deployments. Your first SLM agent might feel constrained compared to the creative possibilities of frontier models. But when you see the cost savings, deployment flexibility, and reliable performance across dozens of model calls per query, you'll understand why SLMs are becoming the workhorses of production agentic AI.
 
 ## Conclusion
 
-The future of production AI isn't about choosing between SLMs and LLMs - it's about deploying each where they excel. SLMs have evolved from "budget alternatives" to purpose-built tools that often outperform their larger siblings on real-world tasks.
+The future of production AI agents isn't about choosing between SLMs and LLMs - it's about deploying each where they excel. SLMs have evolved from "budget alternatives" to purpose-built tools that often outperform their larger siblings on the scoped, repetitive tasks that make up most of an agent's work.
 
-The techniques covered here - in-context learning, careful prompt engineering, RAG augmentation, strategic tool calling, and subagent architectures - transform SLMs into reliable, efficient workhorses. Combined with programmatic complexity to handle logic outside the model, you get systems that are faster, cheaper, and more maintainable than LLM-only approaches.
+The techniques covered here — prompting with examples, RAG augmentation, strategic tool calling, subagent architectures, and programmatic complexity — transform SLMs into reliable, efficient components. Combined with code-side logic to handle deterministic decisions, you get agent systems that are faster, cheaper, and more maintainable than LLM-only approaches.
 
-Start your SLM journey with low-risk, high-volume workloads. Build proper evaluation infrastructure. Migrate incrementally. And remember: most AI tasks don't need frontier reasoning - they need reliable execution in constrained domains. That's exactly where SLMs dominate.
+Start with a single step in your agent loop. Build proper evaluation infrastructure. Iterate. And remember: most steps in an agentic workflow don't need frontier reasoning — they need reliable execution in constrained domains. That's exactly where SLMs dominate.
 
-The era of practical, deployable AI at scale has arrived. It's smaller than you think.
+The era of practical, deployable AI agents at scale has arrived. It's smaller than you think.
 
 ---
 
 **Further Reading**
 - [IBM Granite 4.0 Documentation](https://github.com/ibm-granite/granite-4.0-language-models)
+- [IBM Granite Fine-Tuning with Unsloth](https://www.ibm.com/granite/docs/fine-tune/unsloth)
 - [Small Language Models for Agentic Systems (Research Paper)](https://arxiv.org/abs/2510.03847)
 - [Prompt Engineering Guide - Few-Shot Learning](https://www.promptingguide.ai/techniques/fewshot)
 - [RAG vs Fine-tuning vs Prompt Engineering](https://www.ibm.com/think/topics/rag-vs-fine-tuning-vs-prompt-engineering)
+- [Mellea — Programmatic Agent Patterns](https://mellea.ai/)
