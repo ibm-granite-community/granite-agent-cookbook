@@ -121,6 +121,8 @@ The solution: embed all tool descriptions in a vector store and retrieve only th
 
 Pruning removes only the parts of a retrieved document or tool output that are irrelevant to the current task. Where summarization condenses all content, pruning is surgical, it removes only the parts that are irrelevant, leaving the relevant parts intact. This maps directly to the Chroma finding that even a single distractor degrades accuracy; pruning prevents distractors from entering the context in the first place. Use summarization when all the history is broadly relevant but verbose. Use pruning when some parts are clearly irrelevant.
 
+In practice, pruning is typically implemented as an LLM post-processing step: after a tool returns its output, a lightweight model is asked to extract only the passages relevant to the current task before they are added to the context. LangChain's [contextEditingMiddleware](https://reference.langchain.com/javascript/langchain/index/contextEditingMiddleware) is one ready-made implementation of this pattern that automatically prunes tool results to manage context size.
+
 | Advantages | Limitations |
 | --- | --- |
 | Directly prevents Context Confusion and Poisoning | Adds LLM call per tool output (or dedicated model overhead) |
