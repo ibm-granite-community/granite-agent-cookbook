@@ -20,6 +20,8 @@ While most model APIs are stateless by default and require you to append prior t
 
 State that lives outside the model but can be injected on demand: a [LangGraph state object](https://langchain-ai.github.io/langgraph/concepts/low_level/#state), an in-memory key-value store, a Postgres-backed long-term memory, a vector database. Think of this as the agent's filing cabinet.
 
+Tools are executable functions, but loading all of them at startup can bloat the context window with information not relevant to the current task. Skills address this with a *progressive disclosure* pattern: the agent harness lists only skill names and short descriptions in the system prompt, and the agent reads the full `SKILL.md` containing purpose and instructions only when it determines the skill is needed.
+
 **Life-cycle Context**
 
 Everything that persists across agent runs: user preferences, prior task summaries, learned facts. In LangGraph this maps to a [persistent store](https://langchain-ai.github.io/langgraph/concepts/persistence/) that survives thread boundaries.
