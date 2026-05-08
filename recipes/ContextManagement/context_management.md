@@ -14,6 +14,8 @@ The context window is an agent's entire working memory. Unlike a human, an agent
 
 The live token stream the LLM sees at each call: system prompt, conversation turns, tool definitions, and tool results. This is the only thing that actually influences the model's next output. It is ephemeral by default, reset on every new call unless you explicitly carry it forward. Within a single thread, a thread-scoped memory layer persists the conversation state across LLM calls, automatically replaying it into the next call's context window.
 
+While most model APIs are stateless by default and require you to append prior turns to each request yourself, some frameworks handle this automatically: LangGraph's checkpointer snapshots graph state at each step and replays it on the next call via a `thread_id`, so conversation history is carried forward without any manual wiring.
+
 **Tool / Store Context**
 
 State that lives outside the model but can be injected on demand: a [LangGraph state object](https://langchain-ai.github.io/langgraph/concepts/low_level/#state), an in-memory key-value store, a Postgres-backed long-term memory, a vector database. Think of this as the agent's filing cabinet.
