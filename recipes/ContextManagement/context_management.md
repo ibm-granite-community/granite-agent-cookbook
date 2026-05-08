@@ -105,7 +105,7 @@ Instead of silently dropping old messages, compaction uses an LLM to generate a 
 
 Every tool definition you bind to the LLM consumes tokens and introduces potential confusion. Research from the [RAG-MCP paper](https://arxiv.org/abs/2505.03275) found that above 30 tools with overlapping descriptions, tool selection accuracy degrades sharply; above 100 tools, failure is near-certain. The ["Less is More" paper](https://arxiv.org/abs/2411.15399) showed Llama 3.1 8B fails a benchmark with 46 tools but succeeds with 19.
 
-The solution: embed all tool descriptions in a vector store and retrieve only the semantically relevant tools at each LLM call. The [RAG-MCP](https://arxiv.org/abs/2505.03275) team found this yielded up to 3x improvement in tool selection accuracy.
+The solution: embed all tool descriptions in a vector store and retrieve only the semantically relevant tools at each LLM call. The [RAG-MCP](https://arxiv.org/abs/2505.03275) team found this yielded up to 3x improvement in tool selection accuracy. See the [Tool RAG recipe](../ToolRAG/ToolRAG_Agent.ipynb) in this cookbook for a working implementation.
 
 | Advantages | Limitations |
 | --- | --- |
