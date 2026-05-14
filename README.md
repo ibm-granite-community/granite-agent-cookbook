@@ -55,6 +55,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/AI_Agent_Security/AI_Agent_Security.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
+1. [Introductory Blog for Context Management](recipes/ContextManagement/context_management.md)
 
 ## Build Status
 
