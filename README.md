@@ -33,8 +33,24 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Agent_TDD/Function_Calling_Agent_TDD.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
+
+### Agent Evaluation
+
+1. [LLM as a Judge Basics](recipes/Evaluating/LLM_as_Judge_Basics.ipynb) - Introduction to using LLMs to evaluate agent responses
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Evaluating/LLM_as_Judge_Basics.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
+2. [Ensemble Judges](recipes/Evaluating/Ensemble_Judges.ipynb) - Using multiple judges for more reliable evaluation
+   <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Evaluating/Ensemble_Judges.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
+
+### Advanced Topics
+
 1. [Observability and Testing for Agents using LangFuse](recipes/Tracing/Tracing_Agent.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Tracing/Tracing_Agent.ipynb">
+   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+   </a>
 1. [AI_Agent_Security](recipes/AI_Agent_Security/AI_Agent_Security.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/AI_Agent_Security/AI_Agent_Security.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
