@@ -7,3 +7,5 @@ recipes/Route_and_Solve/Route_and_Solve_Agent.ipynb
 recipes/Tracing/Tracing_Agent.ipynb
 recipes/AI_Agent_Security/AI_Agent_Security.ipynb
 recipes/SLM_Techniques/building_with_slms.ipynb
+recipes/Evaluating/LLM_as_Judge_Basics.ipynb
+recipes/Evaluating/Ensemble_Judges.ipynb
