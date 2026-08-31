@@ -42,7 +42,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
 1. [Introductory Blog for Context Management](recipes/ContextManagement/context_management.md)
-1. [Context Management Recipes Companion Notebook](recipes/ContextManagement/Context_Management.ipynb)
+1. [Context Management for AI Agents in Prectice](recipes/ContextManagement/Context_Management.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/ContextManagement/Context_Management.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
