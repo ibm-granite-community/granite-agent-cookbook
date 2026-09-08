@@ -14,7 +14,7 @@ Through various engagements, we have noted that development teams are building a
 
 In this guide, we assume some knowledge of the following topics (if you need recaps on these, the following links will cover the basics needed for this content):
 
-- Access to a LLM. You can provision your own access to IBM watsonx.ai by following this guide: [Using IBM Granite on IBM watsonx.ai](https://github.com/ibm-granite-community/granite-kitchen/blob/main/recipes/Getting_Started/Getting_Started_with_WatsonX.ipynb).
+- Access to a LLM. You can provision your own access to Granite on Replicate by following this guide: [Using IBM Granite on Replicate](https://github.com/ibm-granite-community/granite-kitchen/blob/main/recipes/Getting_Started/Getting_Started_with_Replicate.ipynb).
 
 - Basic understanding of what are AI Agents. For a quick refresher, check out the post here: [What are AI agents?](https://www.ibm.com/think/topics/ai-agents#7281535)
 
