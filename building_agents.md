@@ -50,6 +50,20 @@ The flow for an FC Agent is:
 
 :exclamation: A common misconception is that the LLM underlying the Agent is able to execute tools, when in fact the LLM is only selecting a tool and the tool parameters to execute based on the query. The tool execution is performed by the program supplementing the LLM invocations.
 
+### Dynamic vs programmatic tool invocations
+
+The flow above describes **dynamic tool invocation**: the LLM chooses which tool (if any) to call and with which arguments, based on the user query and the tool descriptions. That is the default pattern shown in the [Function Calling Agent recipe](recipes/Function_Calling/Function_Calling_Agent.ipynb).
+
+For **known, fixed workflows**, you may not want the LLM to decide which tools to run. Prefer **programmatic tool invocations**: your agent code (or graph nodes) calls tools directly in a prescribed order, and uses the LLM only where language understanding is needed (for example, extracting parameters, summarizing results, or choosing among a small set of branches).
+
+When to prefer programmatic invocations:
+
+- The sequence of tools is known at design time (for example, always validate → fetch → persist).
+- Incorrect tool selection would be costly or unsafe.
+- You want deterministic, testable trajectories without relying on tool-choice accuracy.
+
+Dynamic and programmatic approaches can be combined. For example, Plan-and-Solve agents often let a planner decide *what* to do, while later nodes load and execute prescribed tool-call objects in code.
+
 ### Example
 
 We give below an example of an LLM responding with a tool call with [watsonx.ai chat API](https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-api-chat-tools.html?context=wx).
