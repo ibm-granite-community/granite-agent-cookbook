@@ -189,7 +189,7 @@ After evaluating your agent for use case-specific tasks and goals, there are var
 - Tools which have overlapping functionality.
 - Tools which the agent commonly misuses.
 
-Following this review, Tool and Parameter descriptions should be updated to make easy gains for the agent without any increasing its complexity. Similarly, if your FC Agent utilized a custom system prompt, now is the time to review it: add some generic hints to benefit from easy wins. The evaluation framework and the defined test set offers a means to quickly validate updates to the agent and quantify their effectiveness.
+Following this review, Tool and Parameter descriptions should be updated to make easy gains for the agent without increasing its complexity. Similarly, if your FC Agent utilized a custom system prompt, now is the time to review it: add some generic hints to benefit from easy wins. The evaluation framework and the defined test set offer a means to quickly validate updates to the agent and quantify their effectiveness.
 
 ### Advanced Agent Architectures
 
