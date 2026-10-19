@@ -207,7 +207,7 @@ Following this review, Tool and Parameter descriptions should be updated to make
 
 ### Advanced Agent Architectures
 
-In some case cases, the FC Agent architecture may still prove to be missing accuracy requirements. This can occur for a range of reasons. *For example, if you have a large number of tools in your tool set (50+), if your tools are particularly complex (large number of input parameters) or if the queries require a high number of reasoning steps.* In such setups we can adapt our agent and augment it with more LLM powered nodes and step closer to the requirements for the agent. In this section we cover a few of those architectures and when you may consider using them.
+In some cases, the FC Agent architecture may still prove to be missing accuracy requirements. This can occur for a range of reasons. *For example, if you have a large number of tools in your tool set (50+), if your tools are particularly complex (large number of input parameters) or if the queries require a high number of reasoning steps.* In such setups we can adapt our agent and augment it with more LLM powered nodes and step closer to the requirements for the agent. In this section we cover a few of those architectures and when you may consider using them.
 
 Click through the collapsible sections to learn more:
 
