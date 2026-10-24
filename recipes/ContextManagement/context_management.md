@@ -248,6 +248,14 @@ Context management is the hardest part of building reliable agents. A few themes
 
 ---
 
+## Next Steps
+
+To see all nine strategies running against a real model, open the companion notebook:
+
+- **[Context Management in Practice](./Context_Management.ipynb)** — a runnable Jupyter notebook that demonstrates every strategy in this blog using IBM Granite 4.2-8b on Replicate, with live LLM calls and inline output you can inspect and modify.
+
+---
+
 ## References
 
 | Sources                                                                                                                                                 |
