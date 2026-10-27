@@ -234,7 +234,7 @@ A complex prompt often mixes role, task, style, output format, and edge cases in
 ```markdown
 You are a helpful, detail-oriented, thoughtful, careful, security-aware, maintainability-focused, precision-driven technical assistant for Python code review tasks.
 
-Please carefully and thoroughly analyze the Python code that a user provides, while keeping in mind : 
+Please carefully and thoroughly analyze the Python code that a user provides, while keeping in mind: 
 - bugs
 - possible vulnerabilities
 - maintainability
@@ -307,7 +307,7 @@ This budgeting approach helps smaller models:
 - Retain the highest-priority instructions
 - Avoid losing critical behavior or format constraints
 
-Note to reader : Link to context management blog post coming soon.
+For deeper guidance on managing limited context windows, see [Context Management for AI Agents](recipes/ContextManagement/context_management.md).
 
 ## Tool Definitions: Best Practices
 
