@@ -22,7 +22,7 @@ State that lives outside the model but can be injected on demand: a [LangGraph s
 
 Tools are executable functions, but loading all of them at startup can bloat the context window with information not relevant to the current task. Skills address this with a *progressive disclosure* pattern: the agent harness lists only skill names and short descriptions in the system prompt, and the agent reads the full `SKILL.md` containing purpose and instructions only when it determines the skill is needed.
 
-**Life-cycle Context**
+**Lifecycle Context**
 
 Everything that persists across agent runs: user preferences, prior task summaries, learned facts. In LangGraph this maps to a [persistent store](https://langchain-ai.github.io/langgraph/concepts/persistence/) that survives thread boundaries.
 A common implementation of lifecycle context is a static instruction file `AGENTS.md` committed to the repository and injected into the system prompt at startup. Unlike runtime-accumulated context, it is human-authored and fixed: project conventions, tool rules, and constraints. Since it loads on every call regardless of relevance, it is a fixed token cost that grows silently as the file does.
@@ -186,7 +186,7 @@ Cognition (Devin) uses a fine-tuned model for this step, trained specifically to
 
 Retrieval-Augmented Generation is the act of selectively retrieving relevant information from an external corpus and injecting it into the context window at call time. Rather than pre-loading all knowledge, the agent fetches only what is relevant to the current query.
 
-> **Note:** Combined with Strategy 1 (FIFO), RAG can approximate a lightweight scratchpad pattern: the agent writes findings to an external store, the rolling window keeps the active context lean, and RAG retrieves only the relevant stored content at each step.The core benefit of Strategies 5 and 6 without requiring filesystem infrastructure.
+> **Note:** Combined with Strategy 1 (FIFO), RAG can approximate a lightweight scratchpad pattern: the agent writes findings to an external store, the rolling window keeps the active context lean, and RAG retrieves only the relevant stored content at each step. This gives you the core benefit of Strategies 5 and 6 without requiring filesystem infrastructure.
 
 RAG directly addresses Context Confusion: only semantically relevant chunks enter the context, so the model is not distracted by irrelevant passages. Chroma's LongMemEval results showed that models given focused, relevant context (~300 tokens) vastly outperformed models given the full 113k-token history, even though the full history contained all the necessary information.
 
@@ -221,7 +221,7 @@ A multi-agent setup with a lead agent and subagents often outperforms single-age
 
 ### Strategy Stack by Scenario
 
-Context management is use-case specific. The stacks below are starting points.Your constraints may point to a different combination.
+Context management is use-case specific. The stacks below are starting points. Your constraints may point to a different combination.
 
 | Scenario | Recommended Stack |
 | --- | --- |
