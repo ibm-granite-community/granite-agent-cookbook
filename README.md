@@ -33,7 +33,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Agent_TDD/Function_Calling_Agent_TDD.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
-1. [Observability and Testing for Agents using LangFuse](recipes/Tracing/Tracing_Agent.ipynb)
+1. [Observability and Testing for Agents using Langfuse](recipes/Tracing/Tracing_Agent.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/Tracing/Tracing_Agent.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
@@ -41,7 +41,7 @@ The "Recipes" in the Granite Agent Cookbook showcase the agentic capabilities of
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/AI_Agent_Security/AI_Agent_Security.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
    </a>
-1. [Introductory Blog for Context Management](recipes/ContextManagement/context_management.md)
+1. [Context Management for AI Agents](recipes/ContextManagement/context_management.md)
 1. [Techniques for working with SLMs](recipes/SLM_Techniques/building_with_slms.ipynb)
    <a target="_blank" href="https://colab.research.google.com/github/ibm-granite-community/granite-agent-cookbook/blob/main/recipes/SLM_Techniques/building_with_slms.ipynb">
    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
