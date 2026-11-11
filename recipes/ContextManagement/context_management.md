@@ -2,7 +2,7 @@
 
 ## 1. Introduction: Context Engineering
 
-The context window is an agent's entire working memory. Unlike a human, an agent cannot glance at a whiteboard or flip back through handwritten notes. Every piece of information it needs: task description, tool schemas, conversation history, retrieved documents, prior tool outputs must fit within a fixed token budget, and everything that's in there influences every output.
+The context window is an agent's entire working memory. Unlike a human, an agent cannot glance at a whiteboard or flip back through handwritten notes. Every piece of information it needs (e.g. task description, tool schemas, conversation history, retrieved documents, prior tool outputs) must fit within a fixed token budget, and everything that's in there influences every output.
 
 ---
 
