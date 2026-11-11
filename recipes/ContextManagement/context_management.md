@@ -2,7 +2,7 @@
 
 ## 1. Introduction: Context Engineering
 
-The context window is an agent's entire working memory. Unlike a human, an agent cannot glance at a whiteboard or flip back through handwritten notes. Every piece of information it needs : task description, tool schemas, conversation history, retrieved documents, prior tool outputs must fit within a fixed token budget, and everything that's in there influences every output.
+The context window is an agent's entire working memory. Unlike a human, an agent cannot glance at a whiteboard or flip back through handwritten notes. Every piece of information it needs (e.g. task description, tool schemas, conversation history, retrieved documents, prior tool outputs) must fit within a fixed token budget, and everything that's in there influences every output.
 
 ---
 
@@ -158,7 +158,7 @@ When tasks are long enough to exceed even a well-managed context window, the fil
 
 | Advantages | Limitations |
 | --- | --- |
-| No information loss : full content is always recoverable | Requires filesystem access or object storage |
+| No information loss: full content is always recoverable | Requires filesystem access or object storage |
 | Works for tasks that span multiple agent runs | Agent must be prompted to use file tools consistently |
 | Selective reading (grep) keeps context focused on what's needed now | File management adds coordination overhead for multi-agent systems |
 
@@ -174,7 +174,7 @@ Cognition (Devin) uses a fine-tuned model for this step, trained specifically to
 
 | Advantages | Limitations |
 | --- | --- |
-| Preserves semantically important information even under aggressive compression | No standard LangChain abstraction : must build from scratch |
+| Preserves semantically important information even under aggressive compression | No standard LangChain abstraction: must build from scratch |
 | Can be tuned per domain (coding, research, customer service) | Requires careful prompt engineering or fine-tuning per domain |
 | Produces a structured, inspectable summary | Hardest to evaluate, information loss may be subtle |
 
@@ -194,7 +194,7 @@ RAG directly addresses Context Confusion: only semantically relevant chunks ente
 | --- | --- |
 | Only relevant information enters the context | Retrieval quality depends on embedding model and chunking strategy |
 | Scales to arbitrarily large knowledge bases | Can miss relevant information if the query phrasing doesn't match chunk content |
-| Mature ecosystem : many vector store backends available | Adds infrastructure complexity (vector store, embedding pipeline) |
+| Mature ecosystem: many vector store backends available | Adds infrastructure complexity (vector store, embedding pipeline) |
 
 ---
 
@@ -202,7 +202,7 @@ RAG directly addresses Context Confusion: only semantically relevant chunks ente
 
 **Failure modes addressed:** Context Clash, Context Distraction
 
-Context Quarantine means isolating different parts of a task in separate LLM context windows : each subagent sees only its own thread. This prevents Context Clash and enables each subagent to operate with a clean, focused context.
+Context Quarantine means isolating different parts of a task in separate LLM context windows: each subagent sees only its own thread. This prevents Context Clash and enables each subagent to operate with a clean, focused context.
 
 A multi-agent setup with a lead agent and subagents often outperforms single-agent on research benchmarks largely because each subagent can pursue an independent research direction without accumulating irrelevant context from other directions. With 10 subagents each having a 200k-token window, the system can process 2 million tokens of total information.
 
