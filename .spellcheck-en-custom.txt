@@ -108,3 +108,9 @@ verifier
 VRAM
 watsonx
 YAML
+Trivedy
+Vivek
+codebase
+frontmatter
+integrations
+middleware
